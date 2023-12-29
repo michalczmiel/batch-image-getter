@@ -20,6 +20,7 @@ func docWithLinks(t *testing.T) *html.Node {
 					<img src="https://example.com/image.png" />
 					<img src="https://example.com/wrong-image.svg" />
 				</div>
+				<span data-src="//example.com/image3.png"/>
 				<img src="/image2.png" data-src="https://example.com/image2.png" />
 			</body>
 		</html>
@@ -36,6 +37,7 @@ func docWithLinks(t *testing.T) *html.Node {
 func TestGetImageLinksFromHtmlDoc(t *testing.T) {
 	expectedLinks := []string{
 		"https://example.com/image.png",
+		"//example.com/image3.png",
 		"/image2.png",
 		"https://example.com/image2.png",
 	}

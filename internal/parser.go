@@ -21,7 +21,7 @@ func GetImageLinksFromHtmlDoc(doc *html.Node, imageTypes []string) []string {
 
 	var f func(*html.Node)
 	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "img" {
+		if n.Type == html.ElementNode && (n.Data == "img" || n.Data == "span") {
 			for _, attr := range n.Attr {
 				if isValidImageLink(attr.Val, imageTypes) {
 					links = append(links, attr.Val)
