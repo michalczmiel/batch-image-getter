@@ -30,7 +30,9 @@ func getRandomUserAgent() string {
 }
 
 func request(url string) (*http.Response, error) {
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: 90 * time.Second,
+	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
