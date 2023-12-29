@@ -16,12 +16,16 @@ func isValidImageLink(link string, imageTypes []string) bool {
 	return false
 }
 
+func isNodeWithImageLink(n *html.Node) bool {
+	return n.Type == html.ElementNode && (n.Data == "img" || n.Data == "span")
+}
+
 func GetImageLinksFromHtmlDoc(doc *html.Node, imageTypes []string) []string {
 	var links []string
 
 	var f func(*html.Node)
 	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && (n.Data == "img" || n.Data == "span") {
+		if isNodeWithImageLink(n) {
 			for _, attr := range n.Attr {
 				if isValidImageLink(attr.Val, imageTypes) {
 					links = append(links, attr.Val)
