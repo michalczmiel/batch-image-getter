@@ -10,10 +10,27 @@ import (
 )
 
 var websiteCmd = &cobra.Command{
-	Use:   "website",
+	Use:   "website <url>",
 	Short: "Download all images from a website",
 	RunE:  run,
-	Args:  cobra.MinimumNArgs(1),
+	Args:  validateWebsiteCmdArgs,
+}
+
+func validateWebsiteCmdArgs(cmd *cobra.Command, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("requires a url argument")
+	}
+
+	if len(args) > 1 {
+		return fmt.Errorf("too many arguments, please provide a single url")
+	}
+
+	url := args[0]
+	if !internal.IsUrlValid(url) {
+		return fmt.Errorf("invalid url")
+	}
+
+	return nil
 }
 
 func init() {
