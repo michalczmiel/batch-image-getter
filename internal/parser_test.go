@@ -18,7 +18,7 @@ func docWithLinks(t *testing.T) *html.Node {
 				<a href="https://example.com">Example</a>
 				<div>
 					<img src="https://example.com/image.png" />
-					<img src="https://example.com/wrong-image.svg" />
+					<img src="https://example.com/logo.svg" />
 				</div>
 				<span data-src="//example.com/image3.png"/>
 				<img src="/image2.png" data-src="https://example.com/image2.png" />
@@ -37,14 +37,13 @@ func docWithLinks(t *testing.T) *html.Node {
 func TestGetImageLinksFromHtmlDoc(t *testing.T) {
 	expectedLinks := []string{
 		"https://example.com/image.png",
+		"https://example.com/logo.svg",
 		"//example.com/image3.png",
 		"/image2.png",
 		"https://example.com/image2.png",
 	}
 
-	imageTypes := []string{".png"}
-
-	links := GetImageLinksFromHtmlDoc(docWithLinks(t), imageTypes)
+	links := GetImageLinksFromHtmlDoc(docWithLinks(t))
 
 	if !reflect.DeepEqual(links, expectedLinks) {
 		t.Fatalf("Expected %v links, got %v", expectedLinks, links)

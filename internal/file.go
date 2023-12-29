@@ -10,11 +10,25 @@ func GetFileNameFromUrl(url string) string {
 	return urlParts[len(urlParts)-1]
 }
 
-func ProcessLinks(url string, rawLinks []string) []string {
+func isValidImageLink(link string, imageTypes []string) bool {
+	for _, suffix := range imageTypes {
+		if strings.HasSuffix(link, suffix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ProcessLinks(url string, rawLinks, fileTypes []string) []string {
 	// set is not available in Go, so we use map instead to remove duplicates
 	var validLinks = map[string]struct{}{}
 
 	for _, link := range rawLinks {
+		if !isValidImageLink(link, fileTypes) {
+			continue
+		}
+
 		var fullUrl string
 		if strings.HasPrefix(link, "//") {
 			// is protocol relative link

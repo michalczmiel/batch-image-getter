@@ -31,12 +31,12 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	rawLinks := internal.GetImageLinksFromHtmlDoc(doc, imageTypesToDownload)
+	rawLinks := internal.GetImageLinksFromHtmlDoc(doc)
 	if len(rawLinks) == 0 {
 		return fmt.Errorf("no links found")
 	}
 
-	links := internal.ProcessLinks(url, rawLinks)
+	links := internal.ProcessLinks(url, rawLinks, imageTypesToDownload)
 
 	var wg sync.WaitGroup
 	for _, link := range links {
