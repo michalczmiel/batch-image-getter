@@ -7,10 +7,6 @@ import (
 )
 
 func isValidImageLink(link string, imageTypes []string) bool {
-	if !strings.HasPrefix(link, "https://") {
-		return false
-	}
-
 	for _, suffix := range imageTypes {
 		if strings.HasSuffix(link, suffix) {
 			return true

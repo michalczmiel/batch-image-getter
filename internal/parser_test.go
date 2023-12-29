@@ -36,6 +36,7 @@ func docWithLinks(t *testing.T) *html.Node {
 func TestGetImageLinksFromHtmlDoc(t *testing.T) {
 	expectedLinks := []string{
 		"https://example.com/image.png",
+		"/image2.png",
 		"https://example.com/image2.png",
 	}
 
