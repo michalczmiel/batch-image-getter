@@ -22,6 +22,7 @@ func TestProcessLinks(t *testing.T) {
 		"https://example.com/image1.jpg",
 		"https://example.com/image1.jpg",
 		"http://example.com/image2.jpg",
+		"//example.com/image3.jpg",
 	}
 	url := "https://example.com"
 	expected := []string{
@@ -29,6 +30,7 @@ func TestProcessLinks(t *testing.T) {
 		"https://example.com/2023/01/30/cover.png",
 		"https://example.com/image1.jpg",
 		"http://example.com/image2.jpg",
+		"https://example.com/image3.jpg",
 	}
 
 	actual := ProcessLinks(url, rawLinks)

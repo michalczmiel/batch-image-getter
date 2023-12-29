@@ -16,7 +16,10 @@ func ProcessLinks(url string, rawLinks []string) []string {
 
 	for _, link := range rawLinks {
 		var fullUrl string
-		if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
+		if strings.HasPrefix(link, "//") {
+			// is protocol relative link
+			fullUrl = "https:" + link
+		} else if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
 			fullUrl = link
 		} else {
 			// is relative link
