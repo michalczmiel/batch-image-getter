@@ -12,7 +12,8 @@ func GetFileNameFromUrl(url string) string {
 
 func isValidImageLink(link string, imageTypes []string) bool {
 	for _, suffix := range imageTypes {
-		if strings.HasSuffix(link, suffix) {
+		// // sometimes image links have uppercase extensions
+		if strings.HasSuffix(strings.ToLower(link), suffix) {
 			return true
 		}
 	}
