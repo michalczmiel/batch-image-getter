@@ -28,6 +28,18 @@ func isValidImageLink(link string, imageTypes []string) bool {
 	return false
 }
 
+func resolveUrl(url, link string) string {
+	if strings.HasPrefix(link, "//") {
+		// is protocol relative link
+		return "https:" + link
+	} else if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
+		return link
+	} else {
+		// is relative link
+		return url + link
+	}
+}
+
 func ProcessLinks(url string, rawLinks, fileTypes []string) []string {
 	// set is not available in Go, so we use map instead to remove duplicates
 	var validLinks = map[string]struct{}{}
@@ -37,16 +49,7 @@ func ProcessLinks(url string, rawLinks, fileTypes []string) []string {
 			continue
 		}
 
-		var fullUrl string
-		if strings.HasPrefix(link, "//") {
-			// is protocol relative link
-			fullUrl = "https:" + link
-		} else if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
-			fullUrl = link
-		} else {
-			// is relative link
-			fullUrl = url + link
-		}
+		var fullUrl = resolveUrl(url, link)
 
 		validLinks[fullUrl] = struct{}{}
 	}
