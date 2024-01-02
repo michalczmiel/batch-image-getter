@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -43,6 +44,10 @@ func request(url string) (*http.Response, error) {
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("received status code %d", response.StatusCode)
 	}
 
 	return response, nil
