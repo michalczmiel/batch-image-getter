@@ -5,6 +5,20 @@ import (
 	"sync"
 )
 
+func downloadWorker(wg *sync.WaitGroup, linksToProcess <-chan string) {
+	defer wg.Done()
+
+	for link := range linksToProcess {
+		fileName := GetFileNameFromUrl(link)
+		fmt.Printf("Downloading %s\n", fileName)
+		err := DownloadFileFromUrl(link, fileName)
+
+		if err != nil {
+			fmt.Printf("Error downloading file %s %v", link, err)
+		}
+	}
+}
+
 func DownloadImagesFromWebsite(url string, imageTypesToDownload []string) error {
 	doc, err := GetHtmlDocFromUrl(url)
 	if err != nil {
@@ -20,22 +34,22 @@ func DownloadImagesFromWebsite(url string, imageTypesToDownload []string) error 
 
 	fmt.Printf("Found %d valid image links\n", len(links))
 
+	numberOfWorkers := len(links)
+
+	linksToProcess := make(chan string)
+
 	var wg sync.WaitGroup
-	for _, link := range links {
+
+	for i := 0; i < numberOfWorkers; i++ {
 		wg.Add(1)
-
-		go func(l string) {
-			fileName := GetFileNameFromUrl(l)
-			fmt.Printf("Downloading %s\n", fileName)
-			err = DownloadFileFromUrl(l, fileName)
-
-			defer wg.Done()
-
-			if err != nil {
-				fmt.Printf("Error downloading file %s %v", l, err)
-			}
-		}(link)
+		go downloadWorker(&wg, linksToProcess)
 	}
+
+	for _, link := range links {
+		linksToProcess <- link
+	}
+
+	close(linksToProcess)
 
 	wg.Wait()
 
