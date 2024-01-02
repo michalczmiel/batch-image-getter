@@ -18,15 +18,19 @@ func DownloadImagesFromWebsite(url string, imageTypesToDownload []string) error 
 
 	links := ProcessLinks(url, rawLinks, imageTypesToDownload)
 
+	fmt.Printf("Found %d valid image links\n", len(links))
+
 	var wg sync.WaitGroup
 	for _, link := range links {
 		wg.Add(1)
 
 		go func(l string) {
+			fileName := GetFileNameFromUrl(l)
+			fmt.Printf("Downloading %s\n", fileName)
+			err = DownloadFileFromUrl(l, fileName)
+
 			defer wg.Done()
 
-			fileName := GetFileNameFromUrl(l)
-			err = DownloadFileFromUrl(l, fileName)
 			if err != nil {
 				fmt.Printf("Error downloading file %s %v", l, err)
 			}
