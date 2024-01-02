@@ -7,19 +7,19 @@ BIG is a simple commands line tools to download images from a website.
 For now there is no binary available, so you need to build it yourself.
 
 ```bash
-go run main.go <url>
+go run main.go website <url>
 ```
 
 Specify the extension of the images you want to download with the `-t` flag.
 
 ```bash
-go run main.go --types png --types jpg <url>
+go run main.go website --types png --types jpg <url>
 ```
 
 Example with real website:
 
 ```bash
-go run main.go https://www.nasa.gov/image-of-the-day/
+go run main.go website https://www.nasa.gov/image-of-the-day/
 ```
 
 ## Known limitations
