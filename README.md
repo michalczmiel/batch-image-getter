@@ -27,12 +27,8 @@ go run main.go https://www.nasa.gov/image-of-the-day/
 - BIG is not able to download images from a website that requires authentication
 - BIG is not able to download images from a website that requires JavaScript to display images
 
-## TODO
+## Why BIG is written in Go?
 
-- [ ] Add a flag to specify the output directory
-- [ ] Add a flag to specify the number of concurrent downloads
-- [ ] Accept a list of URLs
-- [ ] Improve error handling (e.g. when the URL is not valid, when the URL is not reachable, when file is too big etc.)
-- [ ] Improve logging (e.g. add a verbose flag)
-- [ ] Produce a binary
-- [ ] Improve testing coverage
+- Go is a compiled language, so it's easy to distribute the binary and run it on any machine
+- As the number of images to download can be large, Go is a good choice to handle concurrency
+- Go is statically typed so it's easier to write a robust program which is good fit for a command line tool as there no easy way to update it once it's distributed
