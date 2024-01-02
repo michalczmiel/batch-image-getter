@@ -10,11 +10,11 @@ func downloadWorker(wg *sync.WaitGroup, linksToProcess <-chan string) {
 
 	for link := range linksToProcess {
 		fileName := GetFileNameFromUrl(link)
-		fmt.Printf("Downloading %s\n", fileName)
+		fmt.Printf("Downloading %s\n", link)
 		err := DownloadFileFromUrl(link, fileName)
 
 		if err != nil {
-			fmt.Printf("Error downloading file %s %v", link, err)
+			fmt.Printf("Error downloading file %s %v\n", link, err)
 		}
 	}
 }
