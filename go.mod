@@ -1,4 +1,4 @@
-module github.com/michalczmiel/batch-image-downloader
+module github.com/michalczmiel/batch-image-getter
 
 go 1.21
 

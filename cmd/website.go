@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/michalczmiel/batch-image-downloader/internal"
+	"github.com/michalczmiel/batch-image-getter/internal"
 	"github.com/spf13/cobra"
 )
 

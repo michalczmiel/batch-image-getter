@@ -1,4 +1,4 @@
-# BIG (batch image downloader)
+# BIG (batch image getter)
 
 BIG is a simple commands line tools to download images from a website.
 
