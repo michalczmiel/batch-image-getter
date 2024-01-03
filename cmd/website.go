@@ -12,10 +12,26 @@ var websiteCmd = &cobra.Command{
 	Use:   "website <url>",
 	Short: "Download all images from a website",
 	RunE:  run,
-	Args:  validateWebsiteCmdArgs,
+	Args: func(cmd *cobra.Command, args []string) error {
+		err := validateArguments(args)
+		if err != nil {
+			return err
+		}
+
+		concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+		if err != nil {
+			return err
+		}
+
+		if concurrentWorkersCount < 1 {
+			return fmt.Errorf("concurrency must be greater than 0")
+		}
+
+		return nil
+	},
 }
 
-func validateWebsiteCmdArgs(cmd *cobra.Command, args []string) error {
+func validateArguments(args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("requires a url argument")
 	}
@@ -27,15 +43,6 @@ func validateWebsiteCmdArgs(cmd *cobra.Command, args []string) error {
 	url := args[0]
 	if !internal.IsUrlValid(url) {
 		return fmt.Errorf("invalid url")
-	}
-
-	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
-	if err != nil {
-		return err
-	}
-
-	if concurrentWorkersCount < 1 {
-		return fmt.Errorf("concurrency must be greater than 0")
 	}
 
 	return nil
