@@ -29,11 +29,21 @@ func validateWebsiteCmdArgs(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid url")
 	}
 
+	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+	if err != nil {
+		return err
+	}
+
+	if concurrentWorkersCount < 1 {
+		return fmt.Errorf("concurrency must be greater than 0")
+	}
+
 	return nil
 }
 
 func init() {
 	websiteCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
+	websiteCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
 	rootCmd.AddCommand(websiteCmd)
 }
 
@@ -45,7 +55,12 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = internal.DownloadImagesFromWebsite(url, imageTypesToDownload)
+	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+	if err != nil {
+		return err
+	}
+
+	err = internal.DownloadImagesFromWebsite(url, imageTypesToDownload, concurrentWorkersCount)
 	if err != nil {
 		return err
 	}

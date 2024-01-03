@@ -19,7 +19,7 @@ func downloadWorker(wg *sync.WaitGroup, linksToProcess <-chan string, failedLink
 	}
 }
 
-func DownloadImagesFromWebsite(url string, imageTypesToDownload []string) error {
+func DownloadImagesFromWebsite(url string, imageTypesToDownload []string, concurrentWorkersCount int) error {
 	doc, err := GetHtmlDocFromUrl(url)
 	if err != nil {
 		return err
@@ -34,14 +34,12 @@ func DownloadImagesFromWebsite(url string, imageTypesToDownload []string) error 
 
 	fmt.Printf("Found %d valid image links\n", len(links))
 
-	numberOfWorkers := len(links)
-
 	linksToProcess := make(chan string)
-	failedLinks := make(chan error, numberOfWorkers)
+	failedLinks := make(chan error, concurrentWorkersCount)
 
 	var wg sync.WaitGroup
 
-	for i := 0; i < numberOfWorkers; i++ {
+	for i := 0; i < concurrentWorkersCount; i++ {
 		wg.Add(1)
 		go downloadWorker(&wg, linksToProcess, failedLinks)
 	}
