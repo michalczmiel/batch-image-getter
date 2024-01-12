@@ -43,8 +43,13 @@ func downloadWorker(wg *sync.WaitGroup, directory string, linksToProcess <-chan 
 	}
 }
 
-// TODO: refactor arguments to be struct
-func DownloadImagesFromWebsite(url string, imageTypesToDownload []string, concurrentWorkersCount int, directory string) error {
+type Parameters struct {
+	Directory  string
+	ImageTypes []string
+	Concurrent int
+}
+
+func DownloadImagesFromWebsite(url string, parameters Parameters) error {
 	doc, err := GetHtmlDocFromUrl(url)
 	if err != nil {
 		return err
@@ -55,23 +60,23 @@ func DownloadImagesFromWebsite(url string, imageTypesToDownload []string, concur
 		return fmt.Errorf("no links found")
 	}
 
-	links := ProcessLinks(url, rawLinks, imageTypesToDownload)
+	links := ProcessLinks(url, rawLinks, parameters.ImageTypes)
 
 	fmt.Printf("Found %d valid image links\n", len(links))
 
-	err = createDirectoryIfDoesNotExists(directory)
+	err = createDirectoryIfDoesNotExists(parameters.Directory)
 	if err != nil {
 		return err
 	}
 
 	linksToProcess := make(chan string)
-	failedLinks := make(chan error, concurrentWorkersCount)
+	failedLinks := make(chan error, parameters.Concurrent)
 
 	var wg sync.WaitGroup
 
-	for i := 0; i < concurrentWorkersCount; i++ {
+	for i := 0; i < parameters.Concurrent; i++ {
 		wg.Add(1)
-		go downloadWorker(&wg, directory, linksToProcess, failedLinks)
+		go downloadWorker(&wg, parameters.Directory, linksToProcess, failedLinks)
 	}
 
 	for _, link := range links {

@@ -73,7 +73,11 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = internal.DownloadImagesFromWebsite(url, imageTypesToDownload, concurrentWorkersCount, directory)
+	err = internal.DownloadImagesFromWebsite(url, internal.Parameters{
+		Directory:  directory,
+		ImageTypes: imageTypesToDownload,
+		Concurrent: concurrentWorkersCount,
+	})
 	if err != nil {
 		return err
 	}
