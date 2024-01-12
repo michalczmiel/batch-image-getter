@@ -2,9 +2,29 @@ package internal
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"sync"
 )
+
+const DefaultPath = "."
+
+func createDirectoryIfDoesNotExists(directory string) error {
+	if directory == DefaultPath {
+		return nil
+	}
+
+	if directory == "" {
+		directory = DefaultPath
+	}
+
+	err := os.MkdirAll(directory, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("error creating directory %s %v", directory, err)
+	}
+
+	return nil
+}
 
 func downloadWorker(wg *sync.WaitGroup, directory string, linksToProcess <-chan string, failedLinks chan<- error) {
 	defer wg.Done()
@@ -38,6 +58,11 @@ func DownloadImagesFromWebsite(url string, imageTypesToDownload []string, concur
 	links := ProcessLinks(url, rawLinks, imageTypesToDownload)
 
 	fmt.Printf("Found %d valid image links\n", len(links))
+
+	err = createDirectoryIfDoesNotExists(directory)
+	if err != nil {
+		return err
+	}
 
 	linksToProcess := make(chan string)
 	failedLinks := make(chan error, concurrentWorkersCount)

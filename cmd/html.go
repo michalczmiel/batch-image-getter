@@ -51,7 +51,7 @@ func validateArguments(args []string) error {
 func init() {
 	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
 	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
-	htmlCmd.Flags().StringP("dir", "d", ".", "directory to save images to")
+	htmlCmd.Flags().StringP("dir", "d", internal.DefaultPath, "directory to save images to")
 	rootCmd.AddCommand(htmlCmd)
 }
 
