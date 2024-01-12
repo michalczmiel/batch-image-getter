@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var websiteCmd = &cobra.Command{
-	Use:   "website <url>",
-	Short: "Download all images from a website",
+var htmlCmd = &cobra.Command{
+	Use:   "html <url>",
+	Short: "Download all images from an HTML website",
 	RunE:  run,
 	Args: func(cmd *cobra.Command, args []string) error {
 		err := validateArguments(args)
@@ -49,9 +49,9 @@ func validateArguments(args []string) error {
 }
 
 func init() {
-	websiteCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
-	websiteCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
-	rootCmd.AddCommand(websiteCmd)
+	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
+	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
+	rootCmd.AddCommand(htmlCmd)
 }
 
 func run(cmd *cobra.Command, args []string) error {

@@ -1,31 +1,31 @@
 # BIG (batch image getter)
 
-BIG is a simple commands line tools to download images from a website.
+BIG is a simple commands line tools for downloading images.
 
 ## Usage
 
 For now there is no binary available, so you need to build it yourself.
 
 ```bash
-go run main.go website <url>
+go run main.go html <url>
 ```
 
 Specify the extension of the images you want to download with the `--types` or `-t` flag.
 
 ```bash
-go run main.go website -t png -t jpg <url>
+go run main.go html -t png -t jpg <url>
 ```
 
 Change the number of concurrent downloads with the `--concurrency` or `-c` flag.
 
 ```bash
-go run main.go website -c 10 <url>
+go run main.go html -c 10 <url>
 ```
 
 Example with real website:
 
 ```bash
-go run main.go website https://www.nasa.gov/image-of-the-day/
+go run main.go html https://www.nasa.gov/image-of-the-day/
 ```
 
 ## Known limitations
