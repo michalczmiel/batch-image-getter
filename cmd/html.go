@@ -51,6 +51,7 @@ func validateArguments(args []string) error {
 func init() {
 	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
 	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
+	htmlCmd.Flags().StringP("dir", "d", ".", "directory to save images to")
 	rootCmd.AddCommand(htmlCmd)
 }
 
@@ -67,7 +68,12 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = internal.DownloadImagesFromWebsite(url, imageTypesToDownload, concurrentWorkersCount)
+	directory, err := cmd.Flags().GetString("dir")
+	if err != nil {
+		return err
+	}
+
+	err = internal.DownloadImagesFromWebsite(url, imageTypesToDownload, concurrentWorkersCount, directory)
 	if err != nil {
 		return err
 	}
