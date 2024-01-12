@@ -26,16 +26,23 @@ func createDirectoryIfDoesNotExists(directory string) error {
 	return nil
 }
 
-func downloadWorker(wg *sync.WaitGroup, directory string, linksToProcess <-chan string, failedLinks chan<- error) {
+type Parameters struct {
+	Directory  string
+	ImageTypes []string
+	Concurrent int
+	UserAgent  string
+}
+
+func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, failedLinks chan<- error) {
 	defer wg.Done()
 
 	for link := range linksToProcess {
 		fileName := GetFileNameFromUrl(link)
 		fmt.Printf("Downloading %s\n", link)
 
-		filePath := path.Join(directory, fileName)
+		filePath := path.Join(parameters.Directory, fileName)
 
-		err := DownloadFileFromUrl(link, filePath)
+		err := DownloadFileFromUrl(link, filePath, parameters.UserAgent)
 
 		if err != nil {
 			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)
@@ -43,14 +50,8 @@ func downloadWorker(wg *sync.WaitGroup, directory string, linksToProcess <-chan 
 	}
 }
 
-type Parameters struct {
-	Directory  string
-	ImageTypes []string
-	Concurrent int
-}
-
 func DownloadImagesFromWebsite(url string, parameters Parameters) error {
-	doc, err := GetHtmlDocFromUrl(url)
+	doc, err := GetHtmlDocFromUrl(url, parameters.UserAgent)
 	if err != nil {
 		return err
 	}
@@ -76,7 +77,7 @@ func DownloadImagesFromWebsite(url string, parameters Parameters) error {
 
 	for i := 0; i < parameters.Concurrent; i++ {
 		wg.Add(1)
-		go downloadWorker(&wg, parameters.Directory, linksToProcess, failedLinks)
+		go downloadWorker(&wg, parameters, linksToProcess, failedLinks)
 	}
 
 	for _, link := range links {

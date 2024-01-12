@@ -30,7 +30,7 @@ func getRandomUserAgent() string {
 	return userAgents[i]
 }
 
-func request(url string) (*http.Response, error) {
+func request(url, userAgent string) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: 90 * time.Second,
 	}
@@ -39,7 +39,11 @@ func request(url string) (*http.Response, error) {
 		return nil, err
 	}
 
-	request.Header.Set("User-Agent", getRandomUserAgent())
+	if userAgent == "" {
+		userAgent = getRandomUserAgent()
+	}
+
+	request.Header.Set("User-Agent", userAgent)
 
 	response, err := client.Do(request)
 	if err != nil {
@@ -53,8 +57,8 @@ func request(url string) (*http.Response, error) {
 	return response, nil
 }
 
-func DownloadFileFromUrl(url, filePath string) error {
-	response, err := request(url)
+func DownloadFileFromUrl(url, filePath, userAgent string) error {
+	response, err := request(url, userAgent)
 	if err != nil {
 		return err
 	}
@@ -74,8 +78,8 @@ func DownloadFileFromUrl(url, filePath string) error {
 	return nil
 }
 
-func GetHtmlDocFromUrl(url string) (*html.Node, error) {
-	response, err := request(url)
+func GetHtmlDocFromUrl(url string, userAgent string) (*html.Node, error) {
+	response, err := request(url, userAgent)
 	if err != nil {
 		return nil, err
 	}

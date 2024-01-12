@@ -52,6 +52,7 @@ func init() {
 	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
 	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
 	htmlCmd.Flags().StringP("dir", "d", internal.DefaultPath, "directory to save images to")
+	htmlCmd.Flags().String("user-agent", "", "custom user agent to use for requests")
 	rootCmd.AddCommand(htmlCmd)
 }
 
@@ -73,10 +74,16 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	userAgent, err := cmd.Flags().GetString("user-agent")
+	if err != nil {
+		return err
+	}
+
 	err = internal.DownloadImagesFromWebsite(url, internal.Parameters{
 		Directory:  directory,
 		ImageTypes: imageTypesToDownload,
 		Concurrent: concurrentWorkersCount,
+		UserAgent:  userAgent,
 	})
 	if err != nil {
 		return err
