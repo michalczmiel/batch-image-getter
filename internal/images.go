@@ -2,29 +2,9 @@ package internal
 
 import (
 	"fmt"
-	"os"
 	"path"
 	"sync"
 )
-
-const DefaultPath = "."
-
-func createDirectoryIfDoesNotExists(directory string) error {
-	if directory == DefaultPath {
-		return nil
-	}
-
-	if directory == "" {
-		directory = DefaultPath
-	}
-
-	err := os.MkdirAll(directory, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("error creating directory %s %v", directory, err)
-	}
-
-	return nil
-}
 
 type Parameters struct {
 	Directory  string
@@ -50,26 +30,7 @@ func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-
 	}
 }
 
-func DownloadImagesFromWebsite(url string, parameters Parameters) error {
-	doc, err := GetHtmlDocFromUrl(url, parameters.UserAgent)
-	if err != nil {
-		return err
-	}
-
-	rawLinks := GetImageLinksFromHtmlDoc(doc)
-	if len(rawLinks) == 0 {
-		return fmt.Errorf("no links found")
-	}
-
-	links := ProcessLinks(url, rawLinks, parameters.ImageTypes)
-
-	fmt.Printf("Found %d valid image links\n", len(links))
-
-	err = createDirectoryIfDoesNotExists(parameters.Directory)
-	if err != nil {
-		return err
-	}
-
+func DownloadImages(links []string, parameters Parameters) error {
 	linksToProcess := make(chan string)
 	failedLinks := make(chan error, parameters.Concurrent)
 

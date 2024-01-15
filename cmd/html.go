@@ -48,6 +48,37 @@ func validateArguments(args []string) error {
 	return nil
 }
 
+func getParameters(cmd *cobra.Command) (internal.Parameters, error) {
+	imageTypesToDownload, err := cmd.Flags().GetStringArray("types")
+	if err != nil {
+		return internal.Parameters{}, err
+	}
+
+	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+	if err != nil {
+		return internal.Parameters{}, err
+	}
+
+	directory, err := cmd.Flags().GetString("dir")
+	if err != nil {
+		return internal.Parameters{}, err
+	}
+
+	userAgent, err := cmd.Flags().GetString("user-agent")
+	if err != nil {
+		return internal.Parameters{}, err
+	}
+
+	parameters := internal.Parameters{
+		ImageTypes: imageTypesToDownload,
+		Directory:  directory,
+		Concurrent: concurrentWorkersCount,
+		UserAgent:  userAgent,
+	}
+
+	return parameters, nil
+}
+
 func init() {
 	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
 	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
@@ -59,32 +90,31 @@ func init() {
 func run(cmd *cobra.Command, args []string) error {
 	url := args[0]
 
-	imageTypesToDownload, err := cmd.Flags().GetStringArray("types")
+	parameters, err := getParameters(cmd)
 	if err != nil {
 		return err
 	}
 
-	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+	doc, err := internal.GetHtmlDocFromUrl(url, parameters.UserAgent)
 	if err != nil {
 		return err
 	}
 
-	directory, err := cmd.Flags().GetString("dir")
+	rawLinks := internal.GetImageLinksFromHtmlDoc(doc)
+	if len(rawLinks) == 0 {
+		return fmt.Errorf("no links found")
+	}
+
+	links := internal.ProcessLinks(url, rawLinks, parameters.ImageTypes)
+
+	fmt.Printf("Found %d valid image links\n", len(links))
+
+	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
 	if err != nil {
 		return err
 	}
 
-	userAgent, err := cmd.Flags().GetString("user-agent")
-	if err != nil {
-		return err
-	}
-
-	err = internal.DownloadImagesFromWebsite(url, internal.Parameters{
-		Directory:  directory,
-		ImageTypes: imageTypesToDownload,
-		Concurrent: concurrentWorkersCount,
-		UserAgent:  userAgent,
-	})
+	err = internal.DownloadImages(links, parameters)
 	if err != nil {
 		return err
 	}
