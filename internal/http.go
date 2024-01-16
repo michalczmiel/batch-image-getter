@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/net/html"
@@ -57,12 +58,17 @@ func request(url, userAgent string) (*http.Response, error) {
 	return response, nil
 }
 
-func DownloadFileFromUrl(url, filePath, userAgent string) error {
+func DownloadImageFromUrl(url, filePath, userAgent string) error {
 	response, err := request(url, userAgent)
 	if err != nil {
 		return err
 	}
 	defer response.Body.Close()
+
+	contentType := response.Header.Get("Content-Type")
+	if !strings.HasPrefix(contentType, "image") {
+		return fmt.Errorf("content type %s is not an image", contentType)
+	}
 
 	file, err := os.Create(filePath)
 	if err != nil {

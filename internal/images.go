@@ -22,7 +22,7 @@ func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-
 
 		filePath := path.Join(parameters.Directory, fileName)
 
-		err := DownloadFileFromUrl(link, filePath, parameters.UserAgent)
+		err := DownloadImageFromUrl(link, filePath, parameters.UserAgent)
 
 		if err != nil {
 			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)
