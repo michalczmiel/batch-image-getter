@@ -33,7 +33,7 @@ func getRandomUserAgent() string {
 
 func request(url, userAgent string) (*http.Response, error) {
 	client := &http.Client{
-		Timeout: 90 * time.Second,
+		Timeout: 15 * time.Second,
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -67,7 +67,7 @@ func DownloadImageFromUrl(url, filePath, userAgent string) error {
 
 	contentType := response.Header.Get("Content-Type")
 	if !strings.HasPrefix(contentType, "image") {
-		return fmt.Errorf("content type %s is not an image", contentType)
+		return fmt.Errorf("content type '%s' is not an image", contentType)
 	}
 
 	file, err := os.Create(filePath)

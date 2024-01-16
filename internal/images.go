@@ -14,11 +14,8 @@ type Parameters struct {
 }
 
 func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, failedLinks chan<- error) {
-	defer wg.Done()
-
 	for link := range linksToProcess {
 		fileName := GetFileNameFromUrl(link)
-		fmt.Printf("Downloading %s\n", link)
 
 		filePath := path.Join(parameters.Directory, fileName)
 
@@ -27,28 +24,33 @@ func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-
 		if err != nil {
 			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)
 		}
+
+		wg.Done()
 	}
 }
 
 func DownloadImages(links []string, parameters Parameters) error {
-	linksToProcess := make(chan string)
-	failedLinks := make(chan error, parameters.Concurrent)
-
+	linksToProcess := make(chan string, len(links))
+	failedLinks := make(chan error, len(links))
 	var wg sync.WaitGroup
-
-	for i := 0; i < parameters.Concurrent; i++ {
-		wg.Add(1)
-		go downloadWorker(&wg, parameters, linksToProcess, failedLinks)
-	}
 
 	for _, link := range links {
 		linksToProcess <- link
 	}
 	close(linksToProcess)
 
-	wg.Wait()
+	// all links need to be processed before closing
+	wg.Add(len(links))
 
-	close(failedLinks)
+	for i := 0; i < parameters.Concurrent; i++ {
+		go downloadWorker(&wg, parameters, linksToProcess, failedLinks)
+	}
+
+	// wait for all workers to finish
+	go func() {
+		wg.Wait()
+		close(failedLinks)
+	}()
 
 	for err := range failedLinks {
 		fmt.Println(err)
