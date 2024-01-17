@@ -15,11 +15,14 @@ type Parameters struct {
 
 func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, failedLinks chan<- error) {
 	for link := range linksToProcess {
-		fileName := GetFileNameFromUrl(link)
+		fileName, err := GetFileNameFromUrl(link)
+		if err != nil {
+			failedLinks <- fmt.Errorf("error parsing url %s %v", link, err)
+		}
 
 		filePath := path.Join(parameters.Directory, fileName)
 
-		err := DownloadImageFromUrl(link, filePath, parameters)
+		err = DownloadImageFromUrl(link, filePath, parameters)
 
 		if err != nil {
 			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)

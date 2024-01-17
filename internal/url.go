@@ -2,13 +2,17 @@ package internal
 
 import (
 	"net/url"
+	"path"
 	"strings"
 )
 
-func GetFileNameFromUrl(url string) string {
-	urlParts := strings.Split(url, "/")
+func GetFileNameFromUrl(imageUrl string) (string, error) {
+	u, err := url.Parse(imageUrl)
+	if err != nil {
+		return "", err
+	}
 
-	return urlParts[len(urlParts)-1]
+	return path.Base(u.Path), nil
 }
 
 func IsUrlValid(rawUrl string) bool {

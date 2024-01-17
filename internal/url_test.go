@@ -5,12 +5,25 @@ import (
 )
 
 func TestGetFileNameFromUrl(t *testing.T) {
-	url := "https://example.com/2023/01/01/logo_main-v2.png"
-	expected := "logo_main-v2.png"
-	actual := GetFileNameFromUrl(url)
+	testdata := []struct {
+		url      string
+		expected string
+	}{
+		{"https://example.com/logo_main-v2.png", "logo_main-v2.png"},
+		{"https://example.com/resource-1240-720", "resource-1240-720"},
+		{"https://example.com/image.jpg?w=1919&h=1280", "image.jpg"},
+	}
 
-	if actual != expected {
-		t.Errorf("want %s got %s", actual, expected)
+	for _, tt := range testdata {
+		actual, err := GetFileNameFromUrl(tt.url)
+
+		if err != nil {
+			t.Errorf("unexpected error: %s", err)
+		}
+
+		if actual != tt.expected {
+			t.Errorf("want %s got %s", tt.expected, actual)
+		}
 	}
 }
 
