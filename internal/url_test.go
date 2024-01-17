@@ -15,8 +15,6 @@ func TestGetFileNameFromUrl(t *testing.T) {
 }
 
 func TestProcessLinks(t *testing.T) {
-	fileTypes := []string{".jpg", ".jpeg", ".png"}
-
 	rawLinks := []string{
 		"/logo_main-v2.png",
 		"/2023/01/30/cover.png",
@@ -34,12 +32,13 @@ func TestProcessLinks(t *testing.T) {
 		"https://example.com/2023/01/30/cover.png",
 		"https://example.com/image1.jpg",
 		"http://example.com/image2.jpg",
+		"https://example.com/logo.svg",
 		"https://example.com/image3.jpg",
 		"https://example.com/image4.JPG",
 		"https://example.com/image5.Png",
 	}
 
-	actual := ProcessLinks(url, rawLinks, fileTypes)
+	actual := ProcessLinks(url, rawLinks)
 
 	if len(actual) != len(expected) {
 		t.Errorf("want %v got %v", expected, actual)

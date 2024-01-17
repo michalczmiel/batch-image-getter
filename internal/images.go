@@ -7,8 +7,8 @@ import (
 )
 
 type Parameters struct {
-	Directory  string
 	ImageTypes []string
+	Directory  string
 	Concurrent int
 	UserAgent  string
 }
@@ -19,7 +19,7 @@ func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-
 
 		filePath := path.Join(parameters.Directory, fileName)
 
-		err := DownloadImageFromUrl(link, filePath, parameters.UserAgent)
+		err := DownloadImageFromUrl(link, filePath, parameters)
 
 		if err != nil {
 			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)

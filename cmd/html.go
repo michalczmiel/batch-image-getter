@@ -48,7 +48,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no links found")
 	}
 
-	links := internal.ProcessLinks(url, rawLinks, parameters.ImageTypes)
+	links := internal.ProcessLinks(url, rawLinks)
 
 	fmt.Printf("Found %d valid image links\n", len(links))
 

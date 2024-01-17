@@ -17,17 +17,6 @@ func IsUrlValid(rawUrl string) bool {
 	return err == nil
 }
 
-func isValidImageLink(link string, imageTypes []string) bool {
-	for _, suffix := range imageTypes {
-		// // sometimes image links have uppercase extensions
-		if strings.HasSuffix(strings.ToLower(link), suffix) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func resolveUrl(url, link string) string {
 	if strings.HasPrefix(link, "//") {
 		// is protocol relative link
@@ -40,15 +29,11 @@ func resolveUrl(url, link string) string {
 	}
 }
 
-func ProcessLinks(url string, rawLinks, fileTypes []string) []string {
+func ProcessLinks(url string, rawLinks []string) []string {
 	// set is not available in Go, so we use map instead to remove duplicates
 	var validLinks = map[string]struct{}{}
 
 	for _, link := range rawLinks {
-		if !isValidImageLink(link, fileTypes) {
-			continue
-		}
-
 		var fullUrl = resolveUrl(url, link)
 
 		validLinks[fullUrl] = struct{}{}

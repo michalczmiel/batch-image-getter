@@ -58,16 +58,33 @@ func request(url, userAgent string) (*http.Response, error) {
 	return response, nil
 }
 
-func DownloadImageFromUrl(url, filePath, userAgent string) error {
-	response, err := request(url, userAgent)
+func validateContentType(contentType string, imageTypes []string) error {
+	if !strings.HasPrefix(contentType, "image") {
+		return fmt.Errorf("content type '%s' is not an image", contentType)
+	}
+
+	imageType := strings.Split(contentType, "/")[1]
+
+	for _, allowedImageType := range imageTypes {
+		if imageType == allowedImageType {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("image type '%s' is not allowed", imageType)
+}
+
+func DownloadImageFromUrl(url, filePath string, parameters Parameters) error {
+	response, err := request(url, parameters.UserAgent)
 	if err != nil {
 		return err
 	}
 	defer response.Body.Close()
 
 	contentType := response.Header.Get("Content-Type")
-	if !strings.HasPrefix(contentType, "image") {
-		return fmt.Errorf("content type '%s' is not an image", contentType)
+	err = validateContentType(contentType, parameters.ImageTypes)
+	if err != nil {
+		return err
 	}
 
 	file, err := os.Create(filePath)

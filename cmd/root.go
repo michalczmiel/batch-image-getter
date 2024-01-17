@@ -45,7 +45,7 @@ func getRootParameters(cmd *cobra.Command) (internal.Parameters, error) {
 }
 
 func init() {
-	htmlCmd.Flags().StringArrayP("types", "t", []string{".jpg", ".jpeg", ".png"}, "image types to download")
+	htmlCmd.Flags().StringArrayP("types", "t", []string{"jpg", "jpeg", "png", "gif", "webp"}, "image types to download")
 	htmlCmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
 	htmlCmd.Flags().StringP("dir", "d", internal.DefaultPath, "directory to save images to")
 	htmlCmd.Flags().String("user-agent", "", "custom user agent to use for requests")
