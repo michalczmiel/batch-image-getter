@@ -73,6 +73,10 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		links = append(links, fileScanner.Text())
 	}
 
+	if len(links) == 0 {
+		return fmt.Errorf("no links found")
+	}
+
 	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
 	if err != nil {
 		return err
