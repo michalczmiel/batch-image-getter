@@ -34,13 +34,9 @@ var htmlCmd = &cobra.Command{
 			return err
 		}
 
-		concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+		err = validateRootFlags(cmd)
 		if err != nil {
 			return err
-		}
-
-		if concurrentWorkersCount < 1 {
-			return fmt.Errorf("concurrency must be greater than 0")
 		}
 
 		return nil

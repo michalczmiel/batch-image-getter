@@ -44,6 +44,19 @@ func getRootParameters(cmd *cobra.Command) (internal.Parameters, error) {
 	return parameters, nil
 }
 
+func validateRootFlags(cmd *cobra.Command) error {
+	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
+	if err != nil {
+		return err
+	}
+
+	if concurrentWorkersCount < 1 {
+		return fmt.Errorf("concurrency must be greater than 0")
+	}
+
+	return nil
+}
+
 func addRootFlags(cmd *cobra.Command) {
 	cmd.Flags().StringArrayP("types", "t", []string{"jpg", "jpeg", "png", "gif", "webp"}, "image types to download")
 	cmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
