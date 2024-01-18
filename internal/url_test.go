@@ -32,7 +32,6 @@ func TestProcessLinks(t *testing.T) {
 		"/logo_main-v2.png",
 		"/2023/01/30/cover.png",
 		"https://example.com/image1.jpg",
-		"https://example.com/image1.jpg",
 		"http://example.com/image2.jpg",
 		"//example.com/image3.jpg",
 		"https://example.com/logo.svg",
@@ -54,6 +53,17 @@ func TestProcessLinks(t *testing.T) {
 	actual := ProcessLinks(url, rawLinks)
 
 	if len(actual) != len(expected) {
+		t.Errorf("want %v got %v", expected, actual)
+	}
+}
+
+func TestRemoveDuplicates(t *testing.T) {
+	given := []string{"a", "b", "b", "c", "d", "a", "b", "e"}
+	expected := []string{"a", "b", "c", "d", "e"}
+
+	actual := RemoveDuplicates(given)
+
+	if len(expected) != len(actual) {
 		t.Errorf("want %v got %v", expected, actual)
 	}
 }

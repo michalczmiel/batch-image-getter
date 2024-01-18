@@ -33,19 +33,30 @@ func resolveUrl(url, link string) string {
 	}
 }
 
-func ProcessLinks(url string, rawLinks []string) []string {
+func RemoveDuplicates(original []string) []string {
 	// set is not available in Go, so we use map instead to remove duplicates
-	var validLinks = map[string]struct{}{}
+	var withoutDuplicatesSet = map[string]struct{}{}
+
+	for _, item := range original {
+		withoutDuplicatesSet[item] = struct{}{}
+	}
+
+	var output []string
+	for item := range withoutDuplicatesSet {
+		output = append(output, item)
+	}
+
+	return output
+}
+
+func ProcessLinks(url string, rawLinks []string) []string {
+	var processedLinks []string
 
 	for _, link := range rawLinks {
 		var fullUrl = resolveUrl(url, link)
 
-		validLinks[fullUrl] = struct{}{}
+		processedLinks = append(processedLinks, fullUrl)
 	}
 
-	var links []string
-	for link := range validLinks {
-		links = append(links, link)
-	}
-	return links
+	return processedLinks
 }

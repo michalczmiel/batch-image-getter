@@ -66,6 +66,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	links := internal.ProcessLinks(url, rawLinks)
+	links = internal.RemoveDuplicates(links)
 
 	fmt.Printf("Found %d valid image links\n", len(links))
 

@@ -63,6 +63,8 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	links = internal.RemoveDuplicates(links)
+
 	if len(links) == 0 {
 		return fmt.Errorf("no links found")
 	}
