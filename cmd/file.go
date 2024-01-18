@@ -1,35 +1,39 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/michalczmiel/batch-image-getter/internal"
 	"github.com/spf13/cobra"
 )
 
-func validateArguments(args []string) error {
+func validateFileCmdArguments(args []string) error {
 	if len(args) < 1 {
-		return fmt.Errorf("requires a url argument")
+		return fmt.Errorf("requires a path argument")
 	}
 
 	if len(args) > 1 {
-		return fmt.Errorf("too many arguments, please provide a single url")
+		return fmt.Errorf("too many arguments, please provide a single file path")
 	}
 
-	url := args[0]
-	if !internal.IsUrlValid(url) {
-		return fmt.Errorf("invalid url")
+	path := args[0]
+	_, err := os.Stat(path)
+
+	if err != nil {
+		return fmt.Errorf("file does not exist")
 	}
 
 	return nil
 }
 
-var htmlCmd = &cobra.Command{
-	Use:   "html <url>",
-	Short: "Download all images from an HTML website",
-	RunE:  runHtmlCmd,
+var fileCmd = &cobra.Command{
+	Use:   "file <path>",
+	Short: "Download all imagess from a file",
+	RunE:  runFileCmd,
 	Args: func(cmd *cobra.Command, args []string) error {
-		err := validateArguments(args)
+		err := validateFileCmdArguments(args)
 		if err != nil {
 			return err
 		}
@@ -47,27 +51,27 @@ var htmlCmd = &cobra.Command{
 	},
 }
 
-func runHtmlCmd(cmd *cobra.Command, args []string) error {
-	url := args[0]
+func runFileCmd(cmd *cobra.Command, args []string) error {
+	filePath := args[0]
 
 	parameters, err := getRootParameters(cmd)
 	if err != nil {
 		return err
 	}
 
-	doc, err := internal.GetHtmlDocFromUrl(url, parameters.UserAgent)
+	file, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
-	rawLinks := internal.GetImageLinksFromHtmlDoc(doc)
-	if len(rawLinks) == 0 {
-		return fmt.Errorf("no links found")
+	fileScanner := bufio.NewScanner(file)
+
+	var links []string
+
+	for fileScanner.Scan() {
+		links = append(links, fileScanner.Text())
 	}
-
-	links := internal.ProcessLinks(url, rawLinks)
-
-	fmt.Printf("Found %d valid image links\n", len(links))
 
 	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
 	if err != nil {
@@ -80,9 +84,8 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-
 }
 
 func init() {
-	rootCmd.AddCommand(htmlCmd)
+	rootCmd.AddCommand(fileCmd)
 }
