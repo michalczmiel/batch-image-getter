@@ -21,18 +21,6 @@ func IsUrlValid(rawUrl string) bool {
 	return err == nil
 }
 
-func resolveUrl(url, link string) string {
-	if strings.HasPrefix(link, "//") {
-		// is protocol relative link
-		return "https:" + link
-	} else if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
-		return link
-	} else {
-		// is relative link
-		return url + link
-	}
-}
-
 func RemoveDuplicates(original []string) []string {
 	// set is not available in Go, so we use map instead to remove duplicates
 	var withoutDuplicatesSet = map[string]struct{}{}
@@ -53,9 +41,19 @@ func ProcessLinks(url string, rawLinks []string) []string {
 	var processedLinks []string
 
 	for _, link := range rawLinks {
-		var fullUrl = resolveUrl(url, link)
+		var resolvedUrl string
 
-		processedLinks = append(processedLinks, fullUrl)
+		if strings.HasPrefix(link, "//") {
+			// is protocol relative link
+			resolvedUrl = "https:" + link
+		} else if strings.HasPrefix(link, "http://") || strings.HasPrefix(link, "https://") {
+			resolvedUrl = link
+		} else {
+			// is relative link
+			resolvedUrl = url + link
+		}
+
+		processedLinks = append(processedLinks, resolvedUrl)
 	}
 
 	return processedLinks
