@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -52,4 +53,21 @@ func addExtensionIfMissing(filePath, contentType string) string {
 	extension = "." + strings.Split(contentType, "/")[1]
 
 	return filePath + extension
+}
+
+func GetLinesFromFile(filePath string) ([]string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileScanner := bufio.NewScanner(file)
+
+	var lines []string
+	for fileScanner.Scan() {
+		lines = append(lines, fileScanner.Text())
+	}
+
+	return lines, nil
 }

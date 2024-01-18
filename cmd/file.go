@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 
@@ -59,18 +58,9 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	file, err := os.Open(filePath)
+	links, err := internal.GetLinesFromFile(filePath)
 	if err != nil {
 		return err
-	}
-	defer file.Close()
-
-	fileScanner := bufio.NewScanner(file)
-
-	var links []string
-
-	for fileScanner.Scan() {
-		links = append(links, fileScanner.Text())
 	}
 
 	if len(links) == 0 {
