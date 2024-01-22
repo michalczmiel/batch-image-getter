@@ -3,6 +3,7 @@ import unittest
 import http.server
 from threading import Thread
 from typing import Final
+import subprocess
 
 
 PORT: Final[int] = 8080
@@ -37,7 +38,7 @@ class BigIntegrationTest(unittest.TestCase):
 
     def test_download_images_from_html(self):
         # when the server is running, run the program to download images
-        os.system(f"go run main.go html http://localhost:{PORT} -d images/")
+        subprocess.run(["go", "run", "main.go", "html", f"http://localhost:{PORT}", "-d", "images/"], check=True)
 
         # then check if the images were downloaded to the file system
         self.assertTrue(does_file_exist("images/300.jpeg"))
