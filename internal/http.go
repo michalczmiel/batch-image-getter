@@ -30,7 +30,9 @@ func getRandomUserAgent() string {
 	return userAgents[i]
 }
 
-func request(url, userAgent string) (*http.Response, error) {
+const DefaultReferer = "https://www.google.com"
+
+func request(url, userAgent, referer string) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: 15 * time.Second,
 	}
@@ -44,6 +46,7 @@ func request(url, userAgent string) (*http.Response, error) {
 	}
 
 	request.Header.Set("User-Agent", userAgent)
+	request.Header.Set("Referer", referer)
 
 	response, err := client.Do(request)
 	if err != nil {
@@ -58,7 +61,9 @@ func request(url, userAgent string) (*http.Response, error) {
 }
 
 func DownloadImageFromUrl(url, filePath string, parameters Parameters) error {
-	response, err := request(url, parameters.UserAgent)
+	rootUrl := getRootUrl(url)
+
+	response, err := request(url, parameters.UserAgent, rootUrl)
 	if err != nil {
 		return err
 	}
@@ -87,7 +92,7 @@ func DownloadImageFromUrl(url, filePath string, parameters Parameters) error {
 }
 
 func GetHtmlDocFromUrl(url string, userAgent string) (*html.Node, error) {
-	response, err := request(url, userAgent)
+	response, err := request(url, userAgent, DefaultReferer)
 	if err != nil {
 		return nil, err
 	}

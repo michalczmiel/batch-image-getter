@@ -67,3 +67,24 @@ func TestRemoveDuplicates(t *testing.T) {
 		t.Errorf("want %v got %v", expected, actual)
 	}
 }
+
+func TestGetRootUrl(t *testing.T) {
+	testdata := []struct {
+		url      string
+		expected string
+	}{
+		{"https://example.com", "https://example.com"},
+		{"http://example.com", "http://example.com"},
+		{"https://example.com/images/image.jpg", "https://example.com"},
+		{"https://example.com/images/image2.jpg?w=1919&h=1280", "https://example.com"},
+		{"https://example.com?example=query", "https://example.com"},
+	}
+
+	for _, tt := range testdata {
+		actual := getRootUrl(tt.url)
+
+		if actual != tt.expected {
+			t.Errorf("want %s got %s", tt.expected, actual)
+		}
+	}
+}
