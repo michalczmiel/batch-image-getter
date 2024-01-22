@@ -13,11 +13,11 @@ type Parameters struct {
 	UserAgent  string
 }
 
-func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, failedLinks chan<- error) {
+func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {
 	for link := range linksToProcess {
 		fileName, err := GetFileNameFromUrl(link)
 		if err != nil {
-			failedLinks <- fmt.Errorf("error parsing url %s %v", link, err)
+			results <- DownloadResult{Url: link, Err: err}
 		}
 
 		filePath := path.Join(parameters.Directory, fileName)
@@ -25,16 +25,24 @@ func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-
 		err = DownloadImageFromUrl(link, filePath, parameters)
 
 		if err != nil {
-			failedLinks <- fmt.Errorf("error downloading file %s %v", link, err)
+			results <- DownloadResult{Url: link, Err: err}
 		}
+
+		results <- DownloadResult{Url: link, Err: nil}
 
 		wg.Done()
 	}
 }
 
+type DownloadResult struct {
+	Url string
+	Err error
+}
+
 func DownloadImages(links []string, parameters Parameters) error {
 	linksToProcess := make(chan string, len(links))
-	failedLinks := make(chan error, len(links))
+	results := make(chan DownloadResult, len(links))
+
 	var wg sync.WaitGroup
 
 	for _, link := range links {
@@ -46,17 +54,19 @@ func DownloadImages(links []string, parameters Parameters) error {
 	wg.Add(len(links))
 
 	for i := 0; i < parameters.Concurrent; i++ {
-		go downloadWorker(&wg, parameters, linksToProcess, failedLinks)
+		go downloadWorker(&wg, parameters, linksToProcess, results)
 	}
 
 	// wait for all workers to finish
 	go func() {
 		wg.Wait()
-		close(failedLinks)
+		close(results)
 	}()
 
-	for err := range failedLinks {
-		fmt.Println(err)
+	for result := range results {
+		if result.Err != nil {
+			fmt.Printf("error downloading %s : %v\n", result.Url, result.Err)
+		}
 	}
 
 	return nil
