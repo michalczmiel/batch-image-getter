@@ -70,10 +70,10 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = internal.DownloadImages(links, parameters)
-	if err != nil {
-		return err
-	}
+	results := internal.DownloadImages(links, parameters)
+
+	printer := internal.NewStdoutPrinter()
+	printer.PrintResultsAsPlainText(results)
 
 	return nil
 }

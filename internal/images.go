@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"path"
 	"sync"
 )
@@ -39,7 +38,7 @@ type DownloadResult struct {
 	Err error
 }
 
-func DownloadImages(links []string, parameters Parameters) error {
+func DownloadImages(links []string, parameters Parameters) []DownloadResult {
 	linksToProcess := make(chan string, len(links))
 	results := make(chan DownloadResult, len(links))
 
@@ -63,11 +62,9 @@ func DownloadImages(links []string, parameters Parameters) error {
 		close(results)
 	}()
 
+	resultsOutput := []DownloadResult{}
 	for result := range results {
-		if result.Err != nil {
-			fmt.Printf("error downloading %s : %v\n", result.Url, result.Err)
-		}
+		resultsOutput = append(resultsOutput, result)
 	}
-
-	return nil
+	return resultsOutput
 }
