@@ -247,4 +247,8 @@ pyrightconfig.json
 .history
 .ionide
 
+# Custom
+
+images/
+
 # End of https://www.toptal.com/developers/gitignore/api/go,macos,visualstudiocode,python
