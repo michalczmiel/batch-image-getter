@@ -1,9 +1,10 @@
 import os
 import unittest
 import http.server
+import subprocess
 from threading import Thread
 from typing import Final
-import subprocess
+from tempfile import TemporaryDirectory
 
 
 PORT: Final[int] = 8080
@@ -36,14 +37,26 @@ class BigIntegrationTest(unittest.TestCase):
         thread = Thread(target=self.server.serve_forever)
         thread.start()
 
-    def test_download_images_from_html(self):
-        # when the server is running, run the program to download images
-        subprocess.run(["go", "run", "main.go", "html", f"http://localhost:{PORT}", "-d", "images/"], check=True)
+    def test_download_images_from_html_and_save_to_directory(self):
+        with TemporaryDirectory() as temp_dir:
+            # when the server is running, run the program to download images
+            subprocess.run(
+                [
+                    "go",
+                    "run",
+                    "main.go",
+                    "html",
+                    f"http://localhost:{PORT}",
+                    "-d",
+                    temp_dir,
+                ],
+                check=True,
+            )
 
-        # then check if the images were downloaded to the file system
-        self.assertTrue(does_file_exist("images/300.jpeg"))
-        self.assertTrue(does_file_exist("images/800.jpeg"))
-        self.assertTrue(does_file_exist("images/1350.jpeg"))
+            # then check if the images were downloaded to the file system
+            self.assertTrue(does_file_exist(os.path.join(temp_dir, "300.jpeg")))
+            self.assertTrue(does_file_exist(os.path.join(temp_dir, "800.jpeg")))
+            self.assertTrue(does_file_exist(os.path.join(temp_dir, "1350.jpeg")))
 
     def tearDown(self) -> None:
         thread = Thread(target=self.server.shutdown)
