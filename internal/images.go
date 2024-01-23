@@ -10,6 +10,7 @@ type Parameters struct {
 	Directory  string
 	Concurrent int
 	UserAgent  string
+	Referer    string
 }
 
 func downloadWorker(wg *sync.WaitGroup, parameters *Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {

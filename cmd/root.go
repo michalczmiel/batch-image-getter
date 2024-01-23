@@ -34,11 +34,17 @@ func getRootParameters(cmd *cobra.Command) (*internal.Parameters, error) {
 		return nil, err
 	}
 
+	referer, err := cmd.Flags().GetString("referer")
+	if err != nil {
+		return nil, err
+	}
+
 	parameters := &internal.Parameters{
 		ImageTypes: imageTypesToDownload,
 		Directory:  directory,
 		Concurrent: concurrentWorkersCount,
 		UserAgent:  userAgent,
+		Referer:    referer,
 	}
 
 	return parameters, nil
@@ -62,6 +68,7 @@ func addRootFlags(cmd *cobra.Command) {
 	cmd.Flags().IntP("concurrency", "c", 10, "number of concurrent downloads")
 	cmd.Flags().StringP("dir", "d", internal.DefaultPath, "directory to save images to")
 	cmd.Flags().String("user-agent", "", "custom user agent to use for requests")
+	cmd.Flags().String("referer", "", "custom referer to use for requests")
 }
 
 func init() {

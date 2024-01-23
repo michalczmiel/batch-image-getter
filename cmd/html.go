@@ -51,7 +51,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	doc, err := internal.GetHtmlDocFromUrl(url, parameters.UserAgent)
+	doc, err := internal.GetHtmlDocFromUrl(url, parameters)
 	if err != nil {
 		return err
 	}

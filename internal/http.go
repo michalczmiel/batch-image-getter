@@ -61,9 +61,14 @@ func request(url, userAgent, referer string) (*http.Response, error) {
 }
 
 func DownloadImageFromUrl(url, filePath string, parameters *Parameters) error {
-	rootUrl := getRootUrl(url)
+	var referer string
+	if parameters.Referer == "" {
+		referer = getRootUrl(url)
+	} else {
+		referer = parameters.Referer
+	}
 
-	response, err := request(url, parameters.UserAgent, rootUrl)
+	response, err := request(url, parameters.UserAgent, referer)
 	if err != nil {
 		return err
 	}
@@ -91,8 +96,15 @@ func DownloadImageFromUrl(url, filePath string, parameters *Parameters) error {
 	return nil
 }
 
-func GetHtmlDocFromUrl(url string, userAgent string) (*html.Node, error) {
-	response, err := request(url, userAgent, DefaultReferer)
+func GetHtmlDocFromUrl(url string, parameters *Parameters) (*html.Node, error) {
+	var referer string
+	if parameters.Referer == "" {
+		referer = DefaultReferer
+	} else {
+		referer = parameters.Referer
+	}
+
+	response, err := request(url, parameters.UserAgent, referer)
 	if err != nil {
 		return nil, err
 	}
