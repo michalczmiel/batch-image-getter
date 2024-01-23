@@ -12,7 +12,7 @@ type Parameters struct {
 	UserAgent  string
 }
 
-func downloadWorker(wg *sync.WaitGroup, parameters Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {
+func downloadWorker(wg *sync.WaitGroup, parameters *Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {
 	for link := range linksToProcess {
 		fileName, err := GetFileNameFromUrl(link)
 		if err != nil {
@@ -38,7 +38,7 @@ type DownloadResult struct {
 	Err error
 }
 
-func DownloadImages(links []string, parameters Parameters) []DownloadResult {
+func DownloadImages(links []string, parameters *Parameters) []DownloadResult {
 	linksToProcess := make(chan string, len(links))
 	results := make(chan DownloadResult, len(links))
 

@@ -13,28 +13,28 @@ var rootCmd = &cobra.Command{
 	Short: "big is a CLI tool for downloading images",
 }
 
-func getRootParameters(cmd *cobra.Command) (internal.Parameters, error) {
+func getRootParameters(cmd *cobra.Command) (*internal.Parameters, error) {
 	imageTypesToDownload, err := cmd.Flags().GetStringArray("types")
 	if err != nil {
-		return internal.Parameters{}, err
+		return nil, err
 	}
 
 	concurrentWorkersCount, err := cmd.Flags().GetInt("concurrency")
 	if err != nil {
-		return internal.Parameters{}, err
+		return nil, err
 	}
 
 	directory, err := cmd.Flags().GetString("dir")
 	if err != nil {
-		return internal.Parameters{}, err
+		return nil, err
 	}
 
 	userAgent, err := cmd.Flags().GetString("user-agent")
 	if err != nil {
-		return internal.Parameters{}, err
+		return nil, err
 	}
 
-	parameters := internal.Parameters{
+	parameters := &internal.Parameters{
 		ImageTypes: imageTypesToDownload,
 		Directory:  directory,
 		Concurrent: concurrentWorkersCount,

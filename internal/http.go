@@ -60,7 +60,7 @@ func request(url, userAgent, referer string) (*http.Response, error) {
 	return response, nil
 }
 
-func DownloadImageFromUrl(url, filePath string, parameters Parameters) error {
+func DownloadImageFromUrl(url, filePath string, parameters *Parameters) error {
 	rootUrl := getRootUrl(url)
 
 	response, err := request(url, parameters.UserAgent, rootUrl)
