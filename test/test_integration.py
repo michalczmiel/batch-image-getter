@@ -1,5 +1,5 @@
-import unittest
 import subprocess
+import unittest
 from tempfile import TemporaryDirectory
 
 from utils import Server, does_directory_contains_file
@@ -33,6 +33,7 @@ class BigIntegrationTest(unittest.TestCase):
         self.assertTrue(does_directory_contains_file(self.directory.name, "300.jpeg"))
         self.assertTrue(does_directory_contains_file(self.directory.name, "800.jpeg"))
         self.assertTrue(does_directory_contains_file(self.directory.name, "1350.jpeg"))
+
 
     def tearDown(self) -> None:
         self.server.stop()
