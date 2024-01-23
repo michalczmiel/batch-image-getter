@@ -22,8 +22,27 @@ func downloadWorker(wg *sync.WaitGroup, parameters *Parameters, linksToProcess <
 
 		filePath := path.Join(parameters.Directory, fileName)
 
-		err = DownloadImageFromUrl(link, filePath, parameters)
+		var referer string
+		if parameters.Referer == "" {
+			referer = getRootUrl(link)
+		} else {
+			referer = parameters.Referer
+		}
 
+		response, err := request(link, parameters.UserAgent, referer)
+		if err != nil {
+			results <- DownloadResult{Url: link, Err: err}
+		}
+
+		contentType := response.Header.Get("Content-Type")
+		err = validateContentType(contentType, parameters.ImageTypes)
+		if err != nil {
+			results <- DownloadResult{Url: link, Err: err}
+		}
+
+		filePath = addExtensionIfMissing(filePath, contentType)
+
+		err = SaveToFile(response.Body, filePath)
 		if err != nil {
 			results <- DownloadResult{Url: link, Err: err}
 		}

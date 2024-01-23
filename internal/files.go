@@ -3,6 +3,7 @@ package internal
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -70,4 +71,21 @@ func GetLinesFromFile(filePath string) ([]string, error) {
 	}
 
 	return lines, nil
+}
+
+func SaveToFile(body io.ReadCloser, path string) error {
+	defer body.Close()
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -2,10 +2,8 @@ package internal
 
 import (
 	"fmt"
-	"io"
 	"math/rand"
 	"net/http"
-	"os"
 	"time"
 
 	"golang.org/x/net/html"
@@ -58,42 +56,6 @@ func request(url, userAgent, referer string) (*http.Response, error) {
 	}
 
 	return response, nil
-}
-
-func DownloadImageFromUrl(url, filePath string, parameters *Parameters) error {
-	var referer string
-	if parameters.Referer == "" {
-		referer = getRootUrl(url)
-	} else {
-		referer = parameters.Referer
-	}
-
-	response, err := request(url, parameters.UserAgent, referer)
-	if err != nil {
-		return err
-	}
-	defer response.Body.Close()
-
-	contentType := response.Header.Get("Content-Type")
-	err = validateContentType(contentType, parameters.ImageTypes)
-	if err != nil {
-		return err
-	}
-
-	correctFilePath := addExtensionIfMissing(filePath, contentType)
-
-	file, err := os.Create(correctFilePath)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, response.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func GetHtmlDocFromUrl(url string, parameters *Parameters) (*html.Node, error) {
