@@ -9,11 +9,11 @@ DIRECTORY: Final[str] = os.path.join(
 )
 
 
-def does_file_exist(path: str) -> bool:
+def does_directory_contains_file(path: str, file: str) -> bool:
     """
-    Checks if a file exists in the file system
+    Checks if the given directory contains the given file
     """
-    return os.path.isfile(path)
+    return os.path.isfile(os.path.join(path, file))
 
 
 class Server:
