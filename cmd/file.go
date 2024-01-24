@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/michalczmiel/batch-image-getter/internal"
 	"github.com/spf13/cobra"
@@ -18,9 +17,8 @@ func validateFileCmdArguments(args []string) error {
 	}
 
 	path := args[0]
-	_, err := os.Stat(path)
 
-	if err != nil {
+	if internal.DoesFileExist(path) == false {
 		return fmt.Errorf("file does not exist")
 	}
 

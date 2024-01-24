@@ -89,3 +89,11 @@ func SaveToFile(body io.ReadCloser, path string) error {
 
 	return nil
 }
+
+func DoesFileExist(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
