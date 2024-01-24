@@ -30,43 +30,11 @@ func getRandomUserAgent() string {
 
 const DefaultReferer = "https://www.google.com"
 
-func request(url, userAgent, referer string) (*http.Response, error) {
-	client := &http.Client{
-		Timeout: 15 * time.Second,
-	}
-	request, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if userAgent == "" {
-		userAgent = getRandomUserAgent()
-	}
-
-	request.Header.Set("User-Agent", userAgent)
-	request.Header.Set("Referer", referer)
-
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("received status code %d", response.StatusCode)
-	}
-
-	return response, nil
-}
-
-func GetHtmlDocFromUrl(url string, parameters *Parameters) (*html.Node, error) {
-	var referer string
-	if parameters.Referer == "" {
-		referer = DefaultReferer
-	} else {
-		referer = parameters.Referer
-	}
-
-	response, err := request(url, parameters.UserAgent, referer)
+func GetHtmlDocFromUrl(url string, httpClient HttpClent, parameters *Parameters) (*html.Node, error) {
+	response, err := httpClient.Request(url, map[string]string{
+		"User-Agent": parameters.UserAgent,
+		"Referer":    parameters.Referer,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -78,4 +46,52 @@ func GetHtmlDocFromUrl(url string, parameters *Parameters) (*html.Node, error) {
 	}
 
 	return doc, nil
+}
+
+type HttpClent interface {
+	Request(url string, headers map[string]string) (*http.Response, error)
+}
+
+type DefaultHttpClient struct {
+	client *http.Client
+}
+
+const Timeout = 15 * time.Second
+
+func NewHttpClient() HttpClent {
+	return &DefaultHttpClient{
+		client: &http.Client{
+			Timeout: Timeout,
+		},
+	}
+}
+
+func (c *DefaultHttpClient) Request(url string, headers map[string]string) (*http.Response, error) {
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if headers["User-Agent"] == "" {
+		headers["User-Agent"] = getRandomUserAgent()
+	}
+
+	if headers["Referer"] == "" {
+		headers["Referer"] = DefaultReferer
+	}
+
+	for key, value := range headers {
+		request.Header.Set(key, value)
+	}
+
+	response, err := c.client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("received status code %d", response.StatusCode)
+	}
+
+	return response, nil
 }

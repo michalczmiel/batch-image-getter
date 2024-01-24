@@ -13,7 +13,7 @@ type Parameters struct {
 	Referer    string
 }
 
-func downloadWorker(wg *sync.WaitGroup, parameters *Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {
+func downloadWorker(wg *sync.WaitGroup, httClient HttpClent, parameters *Parameters, linksToProcess <-chan string, results chan<- DownloadResult) {
 	for link := range linksToProcess {
 		fileName, err := GetFileNameFromUrl(link)
 		if err != nil {
@@ -29,7 +29,10 @@ func downloadWorker(wg *sync.WaitGroup, parameters *Parameters, linksToProcess <
 			referer = parameters.Referer
 		}
 
-		response, err := request(link, parameters.UserAgent, referer)
+		response, err := httClient.Request(link, map[string]string{
+			"User-Agent": parameters.UserAgent,
+			"Referer":    referer,
+		})
 		if err != nil {
 			results <- DownloadResult{Url: link, Err: err}
 		}
@@ -58,7 +61,7 @@ type DownloadResult struct {
 	Err error
 }
 
-func DownloadImages(links []string, parameters *Parameters) []DownloadResult {
+func DownloadImages(links []string, httClient HttpClent, parameters *Parameters) []DownloadResult {
 	linksToProcess := make(chan string, len(links))
 	results := make(chan DownloadResult, len(links))
 
@@ -73,7 +76,7 @@ func DownloadImages(links []string, parameters *Parameters) []DownloadResult {
 	wg.Add(len(links))
 
 	for i := 0; i < parameters.Concurrent; i++ {
-		go downloadWorker(&wg, parameters, linksToProcess, results)
+		go downloadWorker(&wg, httClient, parameters, linksToProcess, results)
 	}
 
 	// wait for all workers to finish
