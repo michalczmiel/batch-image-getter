@@ -1,5 +1,6 @@
 import http.server
 import os
+import subprocess
 from threading import Thread
 from typing import Final
 
@@ -7,6 +8,15 @@ PORT: Final[int] = 8080
 DIRECTORY: Final[str] = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), "testdata/"
 )
+
+
+def run_cli(args: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["go", "run", "main.go"] + args,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
 
 
 class Server:
