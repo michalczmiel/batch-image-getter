@@ -23,5 +23,9 @@ jobs:
           version: v1.54
       - name: Unit tests
         run: go test -v ./...
+      - name: Setup Integration tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r test/requirements.txt
       - name: Integration tests
-        run: python -m unittest discover -v -s test
+        run: pytest
