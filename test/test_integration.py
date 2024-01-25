@@ -4,7 +4,7 @@ import subprocess
 from utils import Server
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def server() -> Server:
     server = Server()
     server.start()
@@ -31,3 +31,36 @@ def test_download_images_from_html_and_save_to_directory(server, tmpdir):
     assert (tmpdir / "300.jpeg").exists()
     assert (tmpdir / "800.jpeg").exists()
     assert (tmpdir / "1350.jpeg").exists()
+
+
+def test_download_images_from_txt_file_and_save_to_directory(server, tmpdir):
+    # create a text file with the URLs of the images
+    text_file = tmpdir / "urls.txt"
+    text_file.write(
+        "\n".join(
+            [
+               "https://picsum.photos/600/600",
+               "https://picsum.photos/1200/1200",
+               "https://picsum.photos/2400/2400",
+            ]
+        )
+    )
+
+    # when the server is running, run the program to download images
+    subprocess.run(
+        [
+            "go",
+            "run",
+            "main.go",
+            "file",
+            text_file.strpath,
+            "-d",
+            tmpdir.strpath,
+        ],
+        check=True,
+    )
+
+    # then check if the images were downloaded to the file system
+    assert (tmpdir / "600.jpeg").exists()
+    assert (tmpdir / "1200.jpeg").exists()
+    assert (tmpdir / "2400.jpeg").exists()
