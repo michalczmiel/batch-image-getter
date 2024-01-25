@@ -9,13 +9,6 @@ DIRECTORY: Final[str] = os.path.join(
 )
 
 
-def does_directory_contains_file(path: str, file: str) -> bool:
-    """
-    Checks if the given directory contains the given file
-    """
-    return os.path.isfile(os.path.join(path, file))
-
-
 class Server:
     """
     A simple HTTP server that serves files from the given directory
