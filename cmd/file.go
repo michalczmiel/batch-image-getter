@@ -18,7 +18,7 @@ func validateFileCmdArguments(args []string) error {
 
 	path := args[0]
 
-	if internal.DoesFileExist(path) == false {
+	if !internal.DoesFileExist(path) {
 		return fmt.Errorf("file does not exist")
 	}
 
