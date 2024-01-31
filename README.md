@@ -6,26 +6,34 @@ BIG is a simple commands line tools for downloading images.
 
 For now there is no binary available, so you need to build it yourself.
 
+### Fetching images from a HTML page
+
 ```bash
 go run main.go html <url>
-```
-
-Specify the extension of the images you want to download with the `--types` or `-t` flag.
-
-```bash
-go run main.go html -t png -t jpg <url>
-```
-
-Change the number of concurrent downloads with the `--concurrency` or `-c` flag.
-
-```bash
-go run main.go html -c 10 <url>
 ```
 
 Example with real website:
 
 ```bash
 go run main.go html https://www.nasa.gov/image-of-the-day/
+```
+
+### Fetching images from text file containing URLs
+
+```bash
+go run main.go file <path>
+```
+
+### Customization using flags
+
+```bash
+Flags:
+  -c, --concurrency int     number of concurrent downloads (default 10)
+  -d, --dir string          directory to save images to (default ".")
+  -h, --help                help for file
+      --referer string      custom referer to use for requests
+  -t, --types stringArray   image types to download (default [jpg,jpeg,png,gif,webp])
+      --user-agent string   custom user agent to use for requests
 ```
 
 ## Known limitations
