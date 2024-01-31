@@ -52,9 +52,16 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	links, err := internal.GetLinesFromFile(filePath)
+	lines, err := internal.GetLinesFromFile(filePath)
 	if err != nil {
 		return err
+	}
+
+	var links []string
+	for _, line := range lines {
+		if internal.IsUrlValid(line) {
+			links = append(links, line)
+		}
 	}
 
 	links = internal.RemoveDuplicates(links)
