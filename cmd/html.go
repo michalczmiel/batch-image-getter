@@ -73,7 +73,8 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	results := internal.DownloadImages(links, httClient, parameters)
+	inputs := internal.PrepareLinksForDownload(links, parameters)
+	results := internal.DownloadImages(inputs, httClient, parameters)
 	printer := internal.NewStdoutPrinter()
 	printer.PrintResultsAsPlainText(results)
 

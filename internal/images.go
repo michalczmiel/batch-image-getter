@@ -13,22 +13,36 @@ type Parameters struct {
 	Referer    string
 }
 
-func downloadImage(link string, httClient HttpClent, parameters *Parameters) error {
-	fileName, err := GetFileNameFromUrl(link)
-	if err != nil {
-		return err
+type DownloadInput struct {
+	Url      string
+	FilePath string
+}
+
+func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadInput {
+	var downloadInputs []DownloadInput
+
+	for _, link := range links {
+		fileName, err := GetFileNameFromUrl(link)
+		if err != nil {
+			continue
+		}
+
+		filePath := path.Join(parameters.Directory, fileName)
+		downloadInputs = append(downloadInputs, DownloadInput{Url: link, FilePath: filePath})
 	}
 
-	filePath := path.Join(parameters.Directory, fileName)
+	return downloadInputs
+}
 
+func downloadImage(link DownloadInput, httClient HttpClent, parameters *Parameters) error {
 	var referer string
 	if parameters.Referer == "" {
-		referer = getRootUrl(link)
+		referer = getRootUrl(link.Url)
 	} else {
 		referer = parameters.Referer
 	}
 
-	response, err := httClient.Request(link, map[string]string{
+	response, err := httClient.Request(link.Url, map[string]string{
 		"User-Agent": parameters.UserAgent,
 		"Referer":    referer,
 	})
@@ -42,7 +56,7 @@ func downloadImage(link string, httClient HttpClent, parameters *Parameters) err
 		return err
 	}
 
-	filePath = addExtensionIfMissing(filePath, contentType)
+	filePath := addExtensionIfMissing(link.FilePath, contentType)
 
 	err = SaveToFile(response.Body, filePath)
 	if err != nil {
@@ -57,8 +71,8 @@ type DownloadResult struct {
 	Err error
 }
 
-func DownloadImages(links []string, httClient HttpClent, parameters *Parameters) []DownloadResult {
-	linksToProcess := make(chan string, len(links))
+func DownloadImages(links []DownloadInput, httClient HttpClent, parameters *Parameters) []DownloadResult {
+	linksToProcess := make(chan DownloadInput, len(links))
 	results := make(chan DownloadResult, len(links))
 
 	var wg sync.WaitGroup
@@ -77,9 +91,9 @@ func DownloadImages(links []string, httClient HttpClent, parameters *Parameters)
 				err := downloadImage(link, httClient, parameters)
 
 				if err != nil {
-					results <- DownloadResult{Url: link, Err: err}
+					results <- DownloadResult{Url: link.Url, Err: err}
 				} else {
-					results <- DownloadResult{Url: link, Err: nil}
+					results <- DownloadResult{Url: link.Url, Err: nil}
 				}
 
 				wg.Done()
