@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"path"
 	"sync"
 )
@@ -21,11 +22,21 @@ type DownloadInput struct {
 func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadInput {
 	var downloadInputs []DownloadInput
 
-	for _, link := range links {
+	// set is not available in Go, so we use map instead to remove duplicates
+	var alreadyTakenNames = map[string]struct{}{}
+
+	for index, link := range links {
 		fileName, err := GetFileNameFromUrl(link)
 		if err != nil {
 			continue
 		}
+
+		_, exists := alreadyTakenNames[fileName]
+		if exists {
+			fileName = fmt.Sprint(index) + fileName
+		}
+
+		alreadyTakenNames[fileName] = struct{}{}
 
 		filePath := path.Join(parameters.Directory, fileName)
 		downloadInputs = append(downloadInputs, DownloadInput{Url: link, FilePath: filePath})
