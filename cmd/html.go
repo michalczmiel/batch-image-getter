@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/michalczmiel/batch-image-getter/internal"
+	"github.com/michalczmiel/batch-image-getter/internal/provider"
 	"github.com/spf13/cobra"
 )
 
@@ -54,7 +55,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	fileSystem := internal.NewFileSystem()
 	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	provider := internal.NewHtmlProvider(url, httpClient, parameters)
+	provider := provider.NewHtmlProvider(url, httpClient, parameters)
 
 	links, err := provider.Links()
 	if err != nil {
