@@ -57,8 +57,7 @@ func downloadImage(link DownloadInput, httClient HttpClient, parameters *Paramet
 	}
 
 	response, err := httClient.Request(link.Url, map[string]string{
-		"User-Agent": parameters.UserAgent,
-		"Referer":    referer,
+		"Referer": referer,
 	})
 	if err != nil {
 		return "", err

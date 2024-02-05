@@ -51,7 +51,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	httClient := internal.NewHttpClient()
+	httClient := internal.NewHttpClient(parameters.UserAgent)
 
 	doc, err := internal.GetHtmlDocFromUrl(url, httClient, parameters)
 	if err != nil {

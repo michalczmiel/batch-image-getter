@@ -79,7 +79,7 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	httpClient := internal.NewHttpClient()
+	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
 	inputs := internal.PrepareLinksForDownload(links, parameters)
 	results := internal.DownloadImages(inputs, httpClient, parameters)

@@ -30,8 +30,7 @@ const DefaultReferer = "https://www.google.com"
 
 func GetHtmlDocFromUrl(url string, httpClient HttpClient, parameters *Parameters) (*html.Node, error) {
 	response, err := httpClient.Request(url, map[string]string{
-		"User-Agent": parameters.UserAgent,
-		"Referer":    parameters.Referer,
+		"Referer": parameters.Referer,
 	})
 	if err != nil {
 		return nil, err
@@ -51,16 +50,22 @@ type HttpClient interface {
 }
 
 type DefaultHttpClient struct {
-	client *http.Client
+	client    *http.Client
+	userAgent string
 }
 
 const Timeout = 15 * time.Second
 
-func NewHttpClient() HttpClient {
+func NewHttpClient(userAgent string) HttpClient {
+	if userAgent == "" {
+		userAgent = getRandomUserAgent()
+	}
+
 	return &DefaultHttpClient{
 		client: &http.Client{
 			Timeout: Timeout,
 		},
+		userAgent: userAgent,
 	}
 }
 
@@ -70,13 +75,11 @@ func (c *DefaultHttpClient) Request(url string, headers map[string]string) (*htt
 		return nil, err
 	}
 
-	if headers["User-Agent"] == "" {
-		headers["User-Agent"] = getRandomUserAgent()
-	}
-
 	if headers["Referer"] == "" {
 		headers["Referer"] = DefaultReferer
 	}
+
+	headers["User-Agent"] = c.userAgent
 
 	for key, value := range headers {
 		request.Header.Set(key, value)
