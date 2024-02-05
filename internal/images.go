@@ -46,7 +46,7 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 	return downloadInputs
 }
 
-func downloadImage(link DownloadInput, httClient HttpClent, parameters *Parameters) (outputPath string, err error) {
+func downloadImage(link DownloadInput, httClient HttpClient, parameters *Parameters) (outputPath string, err error) {
 	var referer string
 	if parameters.Referer == "" {
 		referer = getRootUrl(link.Url)
@@ -84,7 +84,7 @@ type DownloadResult struct {
 	Path string
 }
 
-func DownloadImages(links []DownloadInput, httClient HttpClent, parameters *Parameters) []DownloadResult {
+func DownloadImages(links []DownloadInput, httClient HttpClient, parameters *Parameters) []DownloadResult {
 	linksToProcess := make(chan DownloadInput, len(links))
 	results := make(chan DownloadResult, len(links))
 

@@ -27,7 +27,7 @@ func validateFileCmdArguments(args []string) error {
 
 var fileCmd = &cobra.Command{
 	Use:   "file <path>",
-	Short: "Download all imagess from a file",
+	Short: "Download all images from a file",
 	RunE:  runFileCmd,
 	Args: func(cmd *cobra.Command, args []string) error {
 		err := validateFileCmdArguments(args)

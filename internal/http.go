@@ -28,7 +28,7 @@ func getRandomUserAgent() string {
 
 const DefaultReferer = "https://www.google.com"
 
-func GetHtmlDocFromUrl(url string, httpClient HttpClent, parameters *Parameters) (*html.Node, error) {
+func GetHtmlDocFromUrl(url string, httpClient HttpClient, parameters *Parameters) (*html.Node, error) {
 	response, err := httpClient.Request(url, map[string]string{
 		"User-Agent": parameters.UserAgent,
 		"Referer":    parameters.Referer,
@@ -46,7 +46,7 @@ func GetHtmlDocFromUrl(url string, httpClient HttpClent, parameters *Parameters)
 	return doc, nil
 }
 
-type HttpClent interface {
+type HttpClient interface {
 	Request(url string, headers map[string]string) (*http.Response, error)
 }
 
@@ -56,7 +56,7 @@ type DefaultHttpClient struct {
 
 const Timeout = 15 * time.Second
 
-func NewHttpClient() HttpClent {
+func NewHttpClient() HttpClient {
 	return &DefaultHttpClient{
 		client: &http.Client{
 			Timeout: Timeout,
