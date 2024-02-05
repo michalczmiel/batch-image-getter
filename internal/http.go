@@ -5,8 +5,6 @@ import (
 	"math/rand"
 	"net/http"
 	"time"
-
-	"golang.org/x/net/html"
 )
 
 var userAgents = []string{
@@ -27,23 +25,6 @@ func getRandomUserAgent() string {
 }
 
 const DefaultReferer = "https://www.google.com"
-
-func GetHtmlDocFromUrl(url string, httpClient HttpClient, parameters *Parameters) (*html.Node, error) {
-	response, err := httpClient.Request(url, map[string]string{
-		"Referer": parameters.Referer,
-	})
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	doc, err := html.Parse(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return doc, nil
-}
 
 type HttpClient interface {
 	Request(url string, headers map[string]string) (*http.Response, error)

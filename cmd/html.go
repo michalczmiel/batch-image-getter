@@ -46,26 +46,20 @@ var htmlCmd = &cobra.Command{
 func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	url := args[0]
 
-	fileSystem := internal.NewFileSystem()
-
 	parameters, err := getRootParameters(cmd)
 	if err != nil {
 		return err
 	}
 
+	fileSystem := internal.NewFileSystem()
 	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	doc, err := internal.GetHtmlDocFromUrl(url, httpClient, parameters)
+	provider := internal.NewHtmlProvider(url, httpClient, parameters)
+
+	links, err := provider.Links()
 	if err != nil {
 		return err
 	}
-
-	rawLinks := internal.GetImageLinksFromHtmlDoc(doc)
-	if len(rawLinks) == 0 {
-		return fmt.Errorf("no links found")
-	}
-
-	links := internal.ProcessLinks(url, rawLinks)
 
 	return internal.Run(links, parameters, httpClient, fileSystem)
 }

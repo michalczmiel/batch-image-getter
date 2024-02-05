@@ -55,23 +55,14 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	fileSystem := internal.NewFileSystem()
+	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	lines, err := fileSystem.ReadLines(filePath)
+	provider := internal.NewFileProvider(filePath, fileSystem)
+
+	links, err := provider.Links()
 	if err != nil {
 		return err
 	}
-
-	var links []string
-	for _, line := range lines {
-		if internal.IsUrlValid(line) {
-			links = append(links, line)
-		}
-	}
-	if len(links) == 0 {
-		return fmt.Errorf("no links found")
-	}
-
-	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
 	return internal.Run(links, parameters, httpClient, fileSystem)
 }

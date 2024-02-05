@@ -30,7 +30,8 @@ go run main.go file <path>
 Flags:
   -c, --concurrency int     number of concurrent downloads (default 10)
   -d, --dir string          directory to save images to (default ".")
-  -h, --help                help for file
+  -h, --help                help for html
+      --json                output results as json
       --referer string      custom referer to use for requests
   -t, --types stringArray   image types to download (default [jpg,jpeg,png,gif,webp])
       --user-agent string   custom user agent to use for requests
