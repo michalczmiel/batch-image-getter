@@ -37,10 +37,15 @@ func RemoveDuplicates(original []string) []string {
 	return output
 }
 
-func getRootUrl(u string) string {
-	parsedUrl, _ := url.Parse(u)
+func getRootUrl(u string) (string, error) {
+	parsedUrl, err := url.Parse(u)
+	if err != nil {
+		return "", err
+	}
 
-	return parsedUrl.Scheme + "://" + parsedUrl.Host
+	rootUrl := parsedUrl.Scheme + "://" + parsedUrl.Host
+
+	return rootUrl, nil
 }
 
 func ProcessLinks(url string, rawLinks []string) []string {

@@ -47,10 +47,12 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 }
 
 func downloadImage(link DownloadInput, httClient HttpClient, parameters *Parameters) (outputPath string, err error) {
-	var referer string
-	if parameters.Referer == "" {
-		referer = getRootUrl(link.Url)
-	} else {
+	referer, err := getRootUrl(link.Url)
+	if err != nil {
+		return "", err
+	}
+
+	if parameters.Referer != "" {
 		referer = parameters.Referer
 	}
 
