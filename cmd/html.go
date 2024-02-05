@@ -66,7 +66,8 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	links := internal.ProcessLinks(url, rawLinks)
 	links = internal.RemoveDuplicates(links)
 
-	fmt.Printf("Found %d valid image links\n", len(links))
+	printer := internal.NewStdoutPrinter(parameters.OutputFormat)
+	printer.PrintProgress(len(links))
 
 	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
 	if err != nil {
@@ -75,8 +76,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 
 	inputs := internal.PrepareLinksForDownload(links, parameters)
 	results := internal.DownloadImages(inputs, httClient, parameters)
-	printer := internal.NewStdoutPrinter()
-	printer.PrintResultsAsPlainText(results)
+	printer.PrintResults(results)
 
 	return nil
 }

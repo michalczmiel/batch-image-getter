@@ -7,11 +7,12 @@ import (
 )
 
 type Parameters struct {
-	ImageTypes []string
-	Directory  string
-	Concurrent int
-	UserAgent  string
-	Referer    string
+	ImageTypes   []string
+	Directory    string
+	Concurrent   int
+	UserAgent    string
+	Referer      string
+	OutputFormat OutputFormat
 }
 
 type DownloadInput struct {
@@ -45,7 +46,7 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 	return downloadInputs
 }
 
-func downloadImage(link DownloadInput, httClient HttpClent, parameters *Parameters) error {
+func downloadImage(link DownloadInput, httClient HttpClent, parameters *Parameters) (outputPath string, err error) {
 	var referer string
 	if parameters.Referer == "" {
 		referer = getRootUrl(link.Url)
@@ -58,28 +59,29 @@ func downloadImage(link DownloadInput, httClient HttpClent, parameters *Paramete
 		"Referer":    referer,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	contentType := response.Header.Get("Content-Type")
 	err = validateContentType(contentType, parameters.ImageTypes)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	filePath := addExtensionIfMissing(link.FilePath, contentType)
 
 	err = SaveToFile(response.Body, filePath)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return filePath, nil
 }
 
 type DownloadResult struct {
-	Url string
-	Err error
+	Url  string
+	Err  error
+	Path string
 }
 
 func DownloadImages(links []DownloadInput, httClient HttpClent, parameters *Parameters) []DownloadResult {
@@ -99,12 +101,12 @@ func DownloadImages(links []DownloadInput, httClient HttpClent, parameters *Para
 	for i := 0; i < parameters.Concurrent; i++ {
 		go func() {
 			for link := range linksToProcess {
-				err := downloadImage(link, httClient, parameters)
+				outputPath, err := downloadImage(link, httClient, parameters)
 
 				if err != nil {
-					results <- DownloadResult{Url: link.Url, Err: err}
+					results <- DownloadResult{Url: link.Url, Err: err, Path: ""}
 				} else {
-					results <- DownloadResult{Url: link.Url, Err: nil}
+					results <- DownloadResult{Url: link.Url, Err: nil, Path: outputPath}
 				}
 
 				wg.Done()

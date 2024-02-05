@@ -39,12 +39,23 @@ func getRootParameters(cmd *cobra.Command) (*internal.Parameters, error) {
 		return nil, err
 	}
 
+	json, err := cmd.Flags().GetBool("json")
+	if err != nil {
+		return nil, err
+	}
+
+	outputFormat := internal.PlainText
+	if json {
+		outputFormat = internal.Json
+	}
+
 	parameters := &internal.Parameters{
-		ImageTypes: imageTypesToDownload,
-		Directory:  directory,
-		Concurrent: concurrentWorkersCount,
-		UserAgent:  userAgent,
-		Referer:    referer,
+		ImageTypes:   imageTypesToDownload,
+		Directory:    directory,
+		Concurrent:   concurrentWorkersCount,
+		UserAgent:    userAgent,
+		Referer:      referer,
+		OutputFormat: outputFormat,
 	}
 
 	return parameters, nil
@@ -69,6 +80,7 @@ func addRootFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("dir", "d", internal.DefaultPath, "directory to save images to")
 	cmd.Flags().String("user-agent", "", "custom user agent to use for requests")
 	cmd.Flags().String("referer", "", "custom referer to use for requests")
+	cmd.Flags().Bool("json", false, "output results as json")
 }
 
 func init() {
