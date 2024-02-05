@@ -9,9 +9,20 @@ import (
 	"strings"
 )
 
-const DefaultPath = "."
+type FileSystem interface {
+	CreateDirectory(directory string) error
+	Save(body io.ReadCloser, path string) error
+	ReadLines(path string) ([]string, error)
+	Exists(path string) bool
+}
 
-func CreateDirectoryIfDoesNotExists(directory string) error {
+type DefaultFileSystem struct{}
+
+func NewFileSystem() FileSystem {
+	return &DefaultFileSystem{}
+}
+
+func (f *DefaultFileSystem) CreateDirectory(directory string) error {
 	if directory == DefaultPath {
 		return nil
 	}
@@ -27,6 +38,50 @@ func CreateDirectoryIfDoesNotExists(directory string) error {
 
 	return nil
 }
+
+func (f *DefaultFileSystem) Save(body io.ReadCloser, path string) error {
+	defer body.Close()
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (f *DefaultFileSystem) ReadLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileScanner := bufio.NewScanner(file)
+
+	var lines []string
+	for fileScanner.Scan() {
+		lines = append(lines, fileScanner.Text())
+	}
+
+	return lines, nil
+}
+
+func (f *DefaultFileSystem) Exists(path string) bool {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
+const DefaultPath = "."
 
 func validateContentType(contentType string, imageTypes []string) error {
 	if !strings.HasPrefix(contentType, "image") {
@@ -54,46 +109,4 @@ func addExtensionIfMissing(filePath, contentType string) string {
 	extension = "." + strings.Split(contentType, "/")[1]
 
 	return filePath + extension
-}
-
-func GetLinesFromFile(filePath string) ([]string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	fileScanner := bufio.NewScanner(file)
-
-	var lines []string
-	for fileScanner.Scan() {
-		lines = append(lines, fileScanner.Text())
-	}
-
-	return lines, nil
-}
-
-func SaveToFile(body io.ReadCloser, path string) error {
-	defer body.Close()
-
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	_, err = io.Copy(file, body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func DoesFileExist(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return false
-	}
-
-	return true
 }

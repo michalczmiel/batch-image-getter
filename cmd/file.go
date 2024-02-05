@@ -18,7 +18,9 @@ func validateFileCmdArguments(args []string) error {
 
 	path := args[0]
 
-	if !internal.DoesFileExist(path) {
+	fileSystem := internal.NewFileSystem()
+
+	if !fileSystem.Exists(path) {
 		return fmt.Errorf("file does not exist")
 	}
 
@@ -53,8 +55,9 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	printer := internal.NewStdoutPrinter(parameters.OutputFormat)
+	fileSystem := internal.NewFileSystem()
 
-	lines, err := internal.GetLinesFromFile(filePath)
+	lines, err := fileSystem.ReadLines(filePath)
 	if err != nil {
 		return err
 	}
@@ -74,7 +77,7 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 
 	printer.PrintProgress(len(links))
 
-	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
+	err = fileSystem.CreateDirectory(parameters.Directory)
 	if err != nil {
 		return err
 	}
@@ -82,7 +85,7 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
 	inputs := internal.PrepareLinksForDownload(links, parameters)
-	results := internal.DownloadImages(inputs, httpClient, parameters)
+	results := internal.DownloadImages(inputs, httpClient, fileSystem, parameters)
 
 	printer.PrintResults(results)
 

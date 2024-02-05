@@ -46,6 +46,8 @@ var htmlCmd = &cobra.Command{
 func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	url := args[0]
 
+	fileSystem := internal.NewFileSystem()
+
 	parameters, err := getRootParameters(cmd)
 	if err != nil {
 		return err
@@ -69,13 +71,13 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	printer := internal.NewStdoutPrinter(parameters.OutputFormat)
 	printer.PrintProgress(len(links))
 
-	err = internal.CreateDirectoryIfDoesNotExists(parameters.Directory)
+	err = fileSystem.CreateDirectory(parameters.Directory)
 	if err != nil {
 		return err
 	}
 
 	inputs := internal.PrepareLinksForDownload(links, parameters)
-	results := internal.DownloadImages(inputs, httClient, parameters)
+	results := internal.DownloadImages(inputs, httClient, fileSystem, parameters)
 	printer.PrintResults(results)
 
 	return nil

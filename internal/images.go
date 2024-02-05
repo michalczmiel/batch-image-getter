@@ -46,7 +46,7 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 	return downloadInputs
 }
 
-func downloadImage(link DownloadInput, httClient HttpClient, parameters *Parameters) (outputPath string, err error) {
+func downloadImage(link DownloadInput, httClient HttpClient, fileSystem FileSystem, parameters *Parameters) (outputPath string, err error) {
 	referer, err := getRootUrl(link.Url)
 	if err != nil {
 		return "", err
@@ -71,7 +71,7 @@ func downloadImage(link DownloadInput, httClient HttpClient, parameters *Paramet
 
 	filePath := addExtensionIfMissing(link.FilePath, contentType)
 
-	err = SaveToFile(response.Body, filePath)
+	err = fileSystem.Save(response.Body, filePath)
 	if err != nil {
 		return "", err
 	}
@@ -85,7 +85,7 @@ type DownloadResult struct {
 	Path string
 }
 
-func DownloadImages(links []DownloadInput, httClient HttpClient, parameters *Parameters) []DownloadResult {
+func DownloadImages(links []DownloadInput, httClient HttpClient, fileSystem FileSystem, parameters *Parameters) []DownloadResult {
 	linksToProcess := make(chan DownloadInput, len(links))
 	results := make(chan DownloadResult, len(links))
 
@@ -102,7 +102,7 @@ func DownloadImages(links []DownloadInput, httClient HttpClient, parameters *Par
 	for i := 0; i < parameters.Concurrent; i++ {
 		go func() {
 			for link := range linksToProcess {
-				outputPath, err := downloadImage(link, httClient, parameters)
+				outputPath, err := downloadImage(link, httClient, fileSystem, parameters)
 
 				if err != nil {
 					results <- DownloadResult{Url: link.Url, Err: err, Path: ""}
