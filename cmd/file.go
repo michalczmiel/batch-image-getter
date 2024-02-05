@@ -54,7 +54,6 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	printer := internal.NewStdoutPrinter(parameters.OutputFormat)
 	fileSystem := internal.NewFileSystem()
 
 	lines, err := fileSystem.ReadLines(filePath)
@@ -68,28 +67,13 @@ func runFileCmd(cmd *cobra.Command, args []string) error {
 			links = append(links, line)
 		}
 	}
-
-	links = internal.RemoveDuplicates(links)
-
 	if len(links) == 0 {
 		return fmt.Errorf("no links found")
 	}
 
-	printer.PrintProgress(len(links))
-
-	err = fileSystem.CreateDirectory(parameters.Directory)
-	if err != nil {
-		return err
-	}
-
 	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	inputs := internal.PrepareLinksForDownload(links, parameters)
-	results := internal.DownloadImages(inputs, httpClient, fileSystem, parameters)
-
-	printer.PrintResults(results)
-
-	return nil
+	return internal.Run(links, parameters, httpClient, fileSystem)
 }
 
 func init() {

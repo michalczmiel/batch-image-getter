@@ -53,9 +53,9 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	httClient := internal.NewHttpClient(parameters.UserAgent)
+	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	doc, err := internal.GetHtmlDocFromUrl(url, httClient, parameters)
+	doc, err := internal.GetHtmlDocFromUrl(url, httpClient, parameters)
 	if err != nil {
 		return err
 	}
@@ -66,21 +66,8 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	links := internal.ProcessLinks(url, rawLinks)
-	links = internal.RemoveDuplicates(links)
 
-	printer := internal.NewStdoutPrinter(parameters.OutputFormat)
-	printer.PrintProgress(len(links))
-
-	err = fileSystem.CreateDirectory(parameters.Directory)
-	if err != nil {
-		return err
-	}
-
-	inputs := internal.PrepareLinksForDownload(links, parameters)
-	results := internal.DownloadImages(inputs, httClient, fileSystem, parameters)
-	printer.PrintResults(results)
-
-	return nil
+	return internal.Run(links, parameters, httpClient, fileSystem)
 }
 
 func init() {
