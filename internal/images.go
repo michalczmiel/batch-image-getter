@@ -3,6 +3,8 @@ package internal
 import (
 	"fmt"
 	"path"
+	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -44,6 +46,34 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 	}
 
 	return downloadInputs
+}
+
+func validateContentType(contentType string, imageTypes []string) error {
+	if !strings.HasPrefix(contentType, "image") {
+		return fmt.Errorf("content type '%s' is not an image", contentType)
+	}
+
+	imageType := strings.Split(contentType, "/")[1]
+
+	for _, allowedImageType := range imageTypes {
+		if imageType == allowedImageType {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("image type '%s' is not allowed", imageType)
+}
+
+func addExtensionIfMissing(filePath, contentType string) string {
+	extension := filepath.Ext(filePath)
+
+	if extension != "" {
+		return filePath
+	}
+
+	extension = "." + strings.Split(contentType, "/")[1]
+
+	return filePath + extension
 }
 
 func downloadImage(link DownloadInput, httClient HttpClient, fileSystem FileSystem, parameters *Parameters) (outputPath string, err error) {

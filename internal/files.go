@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
 type FileSystem interface {
@@ -21,6 +19,8 @@ type DefaultFileSystem struct{}
 func NewFileSystem() FileSystem {
 	return &DefaultFileSystem{}
 }
+
+const DefaultPath = "."
 
 func (f *DefaultFileSystem) CreateDirectory(directory string) error {
 	if directory == DefaultPath {
@@ -79,34 +79,4 @@ func (f *DefaultFileSystem) Exists(path string) bool {
 	}
 
 	return true
-}
-
-const DefaultPath = "."
-
-func validateContentType(contentType string, imageTypes []string) error {
-	if !strings.HasPrefix(contentType, "image") {
-		return fmt.Errorf("content type '%s' is not an image", contentType)
-	}
-
-	imageType := strings.Split(contentType, "/")[1]
-
-	for _, allowedImageType := range imageTypes {
-		if imageType == allowedImageType {
-			return nil
-		}
-	}
-
-	return fmt.Errorf("image type '%s' is not allowed", imageType)
-}
-
-func addExtensionIfMissing(filePath, contentType string) string {
-	extension := filepath.Ext(filePath)
-
-	if extension != "" {
-		return filePath
-	}
-
-	extension = "." + strings.Split(contentType, "/")[1]
-
-	return filePath + extension
 }
