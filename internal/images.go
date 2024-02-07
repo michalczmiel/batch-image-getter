@@ -48,30 +48,38 @@ func PrepareLinksForDownload(links []string, parameters *Parameters) []DownloadI
 	return downloadInputs
 }
 
-func validateContentType(contentType string, imageTypes []string) error {
+func getImageType(contentType string) (string, error) {
+	if contentType == "" {
+		return "", fmt.Errorf("content type is empty")
+	}
+
 	if !strings.HasPrefix(contentType, "image") {
-		return fmt.Errorf("content type '%s' is not an image", contentType)
+		return "", fmt.Errorf("content type '%s' is not an image", contentType)
 	}
 
 	imageType := strings.Split(contentType, "/")[1]
 
-	for _, allowedImageType := range imageTypes {
+	return imageType, nil
+}
+
+func isImageTypeAllowed(imageType string, allowedImageTypes []string) bool {
+	for _, allowedImageType := range allowedImageTypes {
 		if imageType == allowedImageType {
-			return nil
+			return true
 		}
 	}
 
-	return fmt.Errorf("image type '%s' is not allowed", imageType)
+	return false
 }
 
-func addExtensionIfMissing(filePath, contentType string) string {
+func addExtensionIfMissing(filePath, imageType string) string {
 	extension := filepath.Ext(filePath)
 
 	if extension != "" {
 		return filePath
 	}
 
-	extension = "." + strings.Split(contentType, "/")[1]
+	extension = "." + imageType
 
 	return filePath + extension
 }
@@ -93,13 +101,16 @@ func downloadImage(link DownloadInput, httClient HttpClient, fileSystem FileSyst
 		return "", err
 	}
 
-	contentType := response.Header.Get("Content-Type")
-	err = validateContentType(contentType, parameters.ImageTypes)
+	imageType, err := getImageType(response.Header.Get("Content-Type"))
 	if err != nil {
 		return "", err
 	}
 
-	filePath := addExtensionIfMissing(link.FilePath, contentType)
+	if !isImageTypeAllowed(imageType, parameters.ImageTypes) {
+		return "", fmt.Errorf("image type '%s' is not allowed", imageType)
+	}
+
+	filePath := addExtensionIfMissing(link.FilePath, imageType)
 
 	err = fileSystem.Save(response.Body, filePath)
 	if err != nil {
