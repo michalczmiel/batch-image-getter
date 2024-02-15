@@ -62,6 +62,14 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	referer, err := internal.GetRootUrl(url)
+	if err != nil {
+		return err
+	}
+
+	// download images from the same domain
+	parameters.Referer = referer
+
 	return internal.Run(links, parameters, httpClient, fileSystem)
 }
 

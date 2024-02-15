@@ -85,17 +85,8 @@ func addExtensionIfMissing(filePath, imageType string) string {
 }
 
 func downloadImage(link DownloadInput, httClient HttpClient, fileSystem FileSystem, parameters *Parameters) (outputPath string, err error) {
-	referer, err := getRootUrl(link.Url)
-	if err != nil {
-		return "", err
-	}
-
-	if parameters.Referer != "" {
-		referer = parameters.Referer
-	}
-
 	response, err := httClient.Request(link.Url, map[string]string{
-		"Referer": referer,
+		"Referer": parameters.Referer,
 	})
 	if err != nil {
 		return "", err

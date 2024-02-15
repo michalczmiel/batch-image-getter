@@ -81,7 +81,7 @@ func TestGetRootUrl(t *testing.T) {
 	}
 
 	for _, tt := range testdata {
-		actual, err := getRootUrl(tt.url)
+		actual, err := GetRootUrl(tt.url)
 
 		if err != nil {
 			t.Errorf("unexpected error: %s", err)

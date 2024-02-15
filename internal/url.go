@@ -37,7 +37,7 @@ func RemoveDuplicates(original []string) []string {
 	return output
 }
 
-func getRootUrl(u string) (string, error) {
+func GetRootUrl(u string) (string, error) {
 	parsedUrl, err := url.Parse(u)
 	if err != nil {
 		return "", err
