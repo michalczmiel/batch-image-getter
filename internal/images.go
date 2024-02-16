@@ -9,12 +9,14 @@ import (
 )
 
 type Parameters struct {
-	ImageTypes   []string
-	Directory    string
-	Concurrent   int
-	UserAgent    string
-	Referer      string
-	OutputFormat OutputFormat
+	ImageTypes       []string
+	Directory        string
+	Concurrent       int
+	UserAgent        string
+	Referer          string
+	OutputFormat     OutputFormat
+	SleepInterval    int
+	MaxSleepInterval int
 }
 
 type DownloadInput struct {
@@ -128,6 +130,8 @@ func DownloadImages(links []DownloadInput, httClient HttpClient, fileSystem File
 	}
 	close(linksToProcess)
 
+	sleeper := NewSleeper(parameters.SleepInterval, parameters.MaxSleepInterval)
+
 	// all links need to be processed before closing
 	wg.Add(len(links))
 
@@ -141,6 +145,8 @@ func DownloadImages(links []DownloadInput, httClient HttpClient, fileSystem File
 				} else {
 					results <- DownloadResult{Url: link.Url, Err: nil, Path: outputPath}
 				}
+
+				sleeper.Sleep()
 
 				wg.Done()
 			}

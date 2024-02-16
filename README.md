@@ -28,13 +28,15 @@ go run main.go file <path>
 
 ```bash
 Flags:
-  -c, --concurrency int     number of concurrent downloads (default 10)
-  -d, --dir string          directory to save images to (default ".")
-  -h, --help                help for html
-      --json                output results as json
-      --referer string      custom referer to use for requests
-  -t, --types stringArray   image types to download (default [jpg,jpeg,png,gif,webp])
-      --user-agent string   custom user agent to use for requests
+  -c, --concurrency int          number of concurrent downloads (default 10)
+  -d, --dir string               directory to save images to (default ".")
+  -h, --help                     help for file
+      --json                     output results as json
+      --max-sleep-interval int   maximum number of seconds to sleep after each request
+      --referer string           custom referer to use for requests
+      --sleep-interval int       number of seconds to sleep after each request or minimum number of seconds for randomized sleep when used along max-sleep-interval (default 0)
+      --types stringArray        image types to download (default [jpg,jpeg,png,gif,webp])
+      --user-agent string        custom user agent to use for requests
 ```
 
 ## Known limitations
