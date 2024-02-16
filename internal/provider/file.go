@@ -1,6 +1,10 @@
 package provider
 
-import "github.com/michalczmiel/batch-image-getter/internal"
+import (
+	"fmt"
+
+	"github.com/michalczmiel/batch-image-getter/internal"
+)
 
 type FileProvider struct {
 	path       string
@@ -15,6 +19,10 @@ func NewFileProvider(path string, fileSystem internal.FileSystem) Provider {
 }
 
 func (p *FileProvider) Links() ([]string, error) {
+	if !p.fileSystem.Exists(p.path) {
+		return nil, fmt.Errorf("file does not exist")
+	}
+
 	lines, err := p.fileSystem.ReadLines(p.path)
 	if err != nil {
 		return nil, err
