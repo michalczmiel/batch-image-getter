@@ -17,14 +17,6 @@ func validateFileCmdArguments(args []string) error {
 		return fmt.Errorf("too many arguments, please provide a single file path")
 	}
 
-	path := args[0]
-
-	fileSystem := internal.NewFileSystem()
-
-	if !fileSystem.Exists(path) {
-		return fmt.Errorf("file does not exist")
-	}
-
 	return nil
 }
 
