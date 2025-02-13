@@ -15,7 +15,7 @@ go run main.go html <url>
 Example with real website:
 
 ```bash
-go run main.go html https://www.nasa.gov/image-of-the-day/
+go run main.go html https://www.nasa.gov/image-of-the-day/ -d space-images
 ```
 
 ### Fetching images from text file containing URLs
@@ -37,6 +37,20 @@ Flags:
       --sleep-interval int       number of seconds to sleep after each request or minimum number of seconds for randomized sleep when used along max-sleep-interval (default 0)
       --types stringArray        image types to download (default [jpg,jpeg,png,gif,webp])
       --user-agent string        custom user agent to use for requests
+```
+
+### Running tests
+
+For Go unit tests:
+
+```bash
+go test ./...
+```
+
+for Python integration tests:
+
+```bash
+pytest
 ```
 
 ## Known limitations
