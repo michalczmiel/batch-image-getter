@@ -44,6 +44,7 @@ func TestGetImageType(t *testing.T) {
 		{"image/webp", "webp", nil},
 		{"", "", fmt.Errorf("content type is empty")},
 		{"text/html", "", fmt.Errorf("content type 'text/html' is not an image")},
+		{"binary/octet-stream", "binary", nil},
 	}
 
 	for _, data := range testdata {

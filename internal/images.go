@@ -55,6 +55,10 @@ func getImageType(contentType string) (string, error) {
 		return "", fmt.Errorf("content type is empty")
 	}
 
+	if contentType == "binary/octet-stream" {
+		return "binary", nil
+	}
+
 	if !strings.HasPrefix(contentType, "image") {
 		return "", fmt.Errorf("content type '%s' is not an image", contentType)
 	}
@@ -97,6 +101,16 @@ func downloadImage(link DownloadInput, httClient HttpClient, fileSystem FileSyst
 	imageType, err := getImageType(response.Header.Get("Content-Type"))
 	if err != nil {
 		return "", err
+	}
+
+	if imageType == "binary" {
+		extension := filepath.Ext(link.Url)
+
+		if extension == "" {
+			return "", fmt.Errorf("could not determine image type")
+		}
+
+		imageType = extension[1:]
 	}
 
 	if !isImageTypeAllowed(imageType, parameters.ImageTypes) {
