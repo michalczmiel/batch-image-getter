@@ -39,6 +39,12 @@ Flags:
       --user-agent string        custom user agent to use for requests
 ```
 
+Specific flags for `html` command:
+
+```bash
+      --regex-search             use regex to search for images in the HTML content
+```
+
 ### Running tests
 
 For Go unit tests:

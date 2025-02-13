@@ -52,10 +52,15 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	regexSearch, err := cmd.Flags().GetBool("regex-search")
+	if err != nil {
+		return err
+	}
+
 	fileSystem := internal.NewFileSystem()
 	httpClient := internal.NewHttpClient(parameters.UserAgent)
 
-	provider := provider.NewHtmlProvider(url, httpClient, parameters)
+	provider := provider.NewHtmlProvider(url, httpClient, parameters, regexSearch)
 
 	links, err := provider.Links()
 	if err != nil {
@@ -74,5 +79,7 @@ func runHtmlCmd(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
+	htmlCmd.Flags().Bool("regex-search", false, "use regex to search for images in the HTML content")
+
 	rootCmd.AddCommand(htmlCmd)
 }

@@ -49,3 +49,5 @@ func TestGetImageLinksFromHtmlDoc(t *testing.T) {
 		t.Fatalf("Expected %v links, got %v", expectedLinks, links)
 	}
 }
+
+// TODO: add test for regex search
